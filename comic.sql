@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: 2018-09-05 00:13:26
+-- Generation Time: 2018-09-05 18:29:58
 -- 服务器版本： 5.7.22
 -- PHP Version: 7.2.7
 
@@ -42,12 +42,12 @@ CREATE TABLE `tb_books` (
 -- --------------------------------------------------------
 
 --
--- 表的结构 `tb_chapter`
+-- 表的结构 `tb_chapters`
 --
 
-CREATE TABLE `tb_chapter` (
+CREATE TABLE `tb_chapters` (
   `id` int(11) NOT NULL COMMENT '编号',
-  `book_id` int(11) NOT NULL COMMENT '漫画ID',
+  `bid` int(11) NOT NULL COMMENT '漫画编号',
   `chapter_id` int(11) NOT NULL COMMENT '章节ID(话)',
   `title` varchar(52) NOT NULL COMMENT '标题',
   `origin_url` varchar(255) NOT NULL COMMENT '采集地址',
@@ -62,10 +62,11 @@ CREATE TABLE `tb_chapter` (
 
 CREATE TABLE `tb_images` (
   `id` int(11) NOT NULL COMMENT '编号',
-  `book_id` int(11) NOT NULL COMMENT '漫画ID',
+  `bid` int(11) NOT NULL COMMENT '漫画编号',
+  `cid` int(11) NOT NULL COMMENT '章节编号',
   `chapter_id` int(11) NOT NULL COMMENT '章节ID',
   `image_url` varchar(255) NOT NULL COMMENT '图片地址',
-  `origin_url` int(11) NOT NULL COMMENT '采集地址',
+  `origin_url` varchar(255) NOT NULL COMMENT '采集地址',
   `is_remote` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否远程图片',
   `created_at` int(11) NOT NULL COMMENT '创建时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='漫画图库';
@@ -81,9 +82,9 @@ ALTER TABLE `tb_books`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `tb_chapter`
+-- Indexes for table `tb_chapters`
 --
-ALTER TABLE `tb_chapter`
+ALTER TABLE `tb_chapters`
   ADD PRIMARY KEY (`id`),
   ADD KEY `cid` (`chapter_id`);
 
@@ -98,9 +99,15 @@ ALTER TABLE `tb_images`
 --
 
 --
--- 使用表AUTO_INCREMENT `tb_chapter`
+-- 使用表AUTO_INCREMENT `tb_books`
 --
-ALTER TABLE `tb_chapter`
+ALTER TABLE `tb_books`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '编号';
+
+--
+-- 使用表AUTO_INCREMENT `tb_chapters`
+--
+ALTER TABLE `tb_chapters`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '编号';
 
 --
