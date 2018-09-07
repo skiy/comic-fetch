@@ -11,6 +11,7 @@ import (
 	"regexp"
 	"strconv"
 	"time"
+	"strings"
 )
 
 type Mh160 struct {
@@ -22,7 +23,7 @@ type Mh160 struct {
 func (t *Mh160) Init(db *gorm.DB) {
 	t.model.Db = db
 
-	t.id = 31512
+	t.id = 11140
 	t.url = "https://m.mh160.com" //手机版
 	//t.url = "https://www.mh160.com" //PC版
 	t.mobileChapter()
@@ -129,32 +130,50 @@ func (t *Mh160) mobileChapter() {
 
 		//fmt.Printf("Review %d: - %s - %s \n", i, chapterName, url)
 
+		var err error
+		var chapterNum int
+
 		preg := `第([0-9]*)话`
 		re := regexp.MustCompile(preg)
 		test := re.FindStringSubmatch(chapterName)
 
-		if len(test) < 2 {
-			log.Fatalf("获取章节ID失败: %s %s", url, chapterName)
+		if len(test) >= 2 {
+			//log.Fatalf("获取章节ID失败: %s %s", url, chapterName)
+			chapterNum, err = strconv.Atoi(test[1])
+			if err != nil {
+				log.Fatalf("章节转Int型失败: %s %s", test[1], chapterName)
+			}
 		}
 
-		chapterNum, err := strconv.Atoi(test[1])
+		//preg := `2[0-9-\s:]*`
+		preg = `/([0-9\/]*)/([0-9\.]*).html`
+		re = regexp.MustCompile(preg)
+		test = re.FindStringSubmatch(url)
+
+		if len(test) < 3 {
+			log.Fatalf("获取章节失败: %s", url)
+		}
+
+		var originChapterId int
+		originChapterId , err = strconv.Atoi(test[2])
 		if err != nil {
-			log.Fatalf("章节转Int型失败: %s %s", test[1], chapterName)
+			log.Fatalf("章节ID转Int型失败: %s %s", test[1], chapterName)
 		}
 
 		//fmt.Println(chapterNum, chapter_1.ChapterId)
-		if chapterNum > chapter_1.ChapterId {
+		if originChapterId > chapter_1.OrderId {
 			chapter := t.model.Table.Chapter
 			chapter.Bid = book.Id
 			chapter.ChapterId = chapterNum
 			chapter.Title = chapterName
+			chapter.OrderId = originChapterId
 			chapter.OriginUrl = t.url + url
 			chapter.CreatedAt = nowTime
 
 			chapter = t.model.CreateChapter(chapter)
 
 			counts := t.countImage(url)
-			t.detail(url, book.Id, chapter.Id, chapterNum, bookName, chapterName, counts)
+			t.detail(test[2], book.Id, chapter.Id, chapterNum, bookName, chapterName, counts)
 		}
 	})
 }
@@ -192,16 +211,9 @@ func (t *Mh160) countImage(url string) (counts int) {
 /**
 获取漫画图片
 */
-func (t *Mh160) detail(url string, bookId, chapterId, chapterNum int, bookName, chapterName string, counts int) {
+func (t *Mh160) detail(originChapterId string, bookId, chapterId, chapterNum int, bookName, chapterName string, counts int) {
 	imgUrl := "https://mhpic5.lineinfo.cn/mh160tuku/w/%s_%d/%s_%s/"
 
-	//preg := `2[0-9-\s:]*`
-	preg := `/([0-9\/]*)/([0-9\.]*).html`
-	re := regexp.MustCompile(preg)
-	test := re.FindStringSubmatch(url)
-
-	//fmt.Println(test[1], test[2])
-	originChapterId := test[2]
 	imgUrl1 := fmt.Sprintf(imgUrl, bookName, t.id, chapterName, originChapterId) + "00%s.jpg"
 	//fmt.Println(imgUrl1)
 
@@ -222,7 +234,8 @@ func (t *Mh160) detail(url string, bookId, chapterId, chapterNum int, bookName, 
 			fix = strconv.Itoa(i)
 		}
 
-		images.OriginUrl = fmt.Sprintf(imgUrl1, fix)
+		images.OriginUrl = strings.Replace(fmt.Sprintf(imgUrl1, fix), " ", "", -1)
+		images.OrderId = i
 
 		t.model.CreateImages(images)
 

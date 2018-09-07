@@ -21,7 +21,8 @@ type tb_chapter struct {
 	Id,
 	Bid,
 	ChapterId int
-	Title,
+	Title string
+	OrderId int
 	OriginUrl string
 	CreatedAt int64
 }
@@ -33,6 +34,7 @@ type tb_images struct {
 	ChapterId int
 	ImageUrl,
 	OriginUrl string
-	IsRemote,
+	OrderId,
+	IsRemote int
 	CreatedAt int64
 }
