@@ -32,7 +32,7 @@ $headers = array(
     'DNT: 1',
     'If-Modified-Since: Thu, 06 Sep 2018 03:54:19 GMT',
     'If-None-Match: "BDE9E8B0317BF99A37BE8FE52763AF1E"',
-    'Referer: https://www.mh160.com',
+    'Referer: https://www.mh160.com/kanmanhua/31512/660572.html',
 );
 
 header('content-type: image/jpeg');

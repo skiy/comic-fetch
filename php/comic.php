@@ -5,7 +5,7 @@ define('DEBUG', true);
 ini_set("display_errors", DEBUG);
 error_reporting(E_ALL);
 
-$bookId = $_GET['bookid'] ?? '';
+$bookId = $_GET['book_id'] ?? '';
 $orderBy = $_GET['order'] ?? '0';
 
 if ($bookId <= 0) {
@@ -24,7 +24,7 @@ if ($bookInfo === false) {
 }
 
 $orderBy = ($orderBy == 0) ? 'DESC' : 'ASC';
-$chapterSql = "SELECT * FROM tb_chapters WHERE bid = :bid ORDER BY chapter_id {$orderBy}";
+$chapterSql = "SELECT * FROM tb_chapters WHERE bid = :bid ORDER BY order_id {$orderBy}";
 $sth = $dbh->prepare($chapterSql);
 $sth->execute(array(':bid' => $bookId));
 $chapterInfo = $sth->fetchAll();
