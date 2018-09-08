@@ -24,7 +24,7 @@ if ($bookInfo === false) {
 }
 
 $orderBy = ($orderBy == 0) ? 'DESC' : 'ASC';
-$chapterSql = "SELECT * FROM tb_chapters WHERE bid = :bid ORDER BY order_id {$orderBy}";
+$chapterSql = "SELECT * FROM tb_chapters WHERE bid = :bid ORDER BY chapter_id {$orderBy}";
 $sth = $dbh->prepare($chapterSql);
 $sth->execute(array(':bid' => $bookId));
 $chapterInfo = $sth->fetchAll();

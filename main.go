@@ -1,8 +1,8 @@
 package main
 
 import (
+	"code.aliyun.com/skiystudy/comicFetch/controller"
 	"code.aliyun.com/skiystudy/comicFetch/library"
-	"code.aliyun.com/skiystudy/comicFetch/source"
 	"log"
 )
 
@@ -14,6 +14,5 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	comic := new(source.Mh160)
-	comic.Init(dbh)
+	new(controller.Init).Construct(dbh)
 }

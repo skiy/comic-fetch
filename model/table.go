@@ -11,7 +11,8 @@ type tb_books struct {
 	Name   string
 	Status int
 	OriginUrl,
-	OriginWeb string
+	OriginWeb,
+	OriginImageUrl string
 	OriginBookId int
 	UpdatedAt,
 	CreatedAt int64
@@ -21,8 +22,8 @@ type tb_chapter struct {
 	Id,
 	Bid,
 	ChapterId int
-	Title string
-	OrderId int
+	Title     string
+	OrderId   int
 	OriginUrl string
 	CreatedAt int64
 }
