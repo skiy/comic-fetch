@@ -28,43 +28,9 @@ func (t *mh160) Init() {
 
 	t.originWeb = "漫画160"
 	t.url = "https://m.mh160.com" //手机版
-	//t.url = "https://www.mh160.com" //PC版
 
 	t.mobileChapter()
 }
-
-/**
-PC端获取章节
-*/
-/*
-func (t *Mh160) pcChapter() {
-	bookUrl := fmt.Sprintf("/kanmanhua/%d/", t.id)
-
-	doc := t.fetchSource(t.url + bookUrl)
-
-	var bookName string
-	doc.Find(".intro_l").Each(func(i int, s *goquery.Selection) {
-		bookName = s.Find(".title h1").Text()
-		//fmt.Println(bookName)
-	})
-
-	doc.Find("#pic-list").Each(func(i int, s *goquery.Selection) {
-		bookName = s.Find(".title h1").Text()
-		fmt.Println(bookName)
-	})
-
-	//doc.Find(".chapter-list ul li").Each(func(i int, s *goquery.Selection) { //手机版
-	doc.Find(".plist ul li").Each(func(i int, s *goquery.Selection) {
-		chapterName := s.Find("a").Text()
-		url, _ := s.Find("a").Attr("href")
-
-		//fmt.Printf("Review %d: - %s - %s \n", i, chapterName, url)
-
-		counts := t.countImage(url)
-		t.detail(url, book.Id, chapter.Id, bookName, chapterName, counts)
-	})
-}
-*/
 
 /**
 移动端获取章节
@@ -156,10 +122,18 @@ func (t *mh160) mobileChapter() {
 			chapter.OriginUrl = t.url + url
 			chapter.CreatedAt = nowTime
 
-			chapter = t.model.CreateChapter(chapter)
+			chapterInfo := t.model.CreateChapter(chapter)
 
+			//获取共几话
 			counts := t.countImage(url)
-			t.detail(test[2], book.Id, chapter.Id, chapterNum, bookName, chapterName, counts)
+
+			chapterName = strings.Replace(chapterName, "-", "", -1)
+			chapterName = strings.Replace(chapterName, "，", "-", -1)
+			chapterName = strings.Replace(chapterName, "！", "-", -1)
+			chapterName = strings.Replace(chapterName, "/", "_", -1)
+
+			//图片
+			t.detail(test[2], book.Id, chapterInfo.Id, chapterNum, bookName, chapterName, counts)
 			//return
 		}
 	})
@@ -199,50 +173,38 @@ func (t *mh160) countImage(url string) (counts int) {
 获取漫画图片
 */
 func (t *mh160) detail(originChapterId string, bookId, chapterId, chapterNum int, bookName, chapterName string, counts int) {
-	var imgUrl1 string
-	imgUrl := "https://mhpic5.lineinfo.cn/mh160tuku/%s/%s_%d/%s_%s/"
+	var realUrl string
+	var has bool
+
+	baseUrl := "https://mhpic%s.lineinfo.cn/mh160tuku/%s/%s_%d/%s_%s/"
+	//fmt.Println("originImageUrl", t.originImageUrl)
 
 	//有源
 	if t.originImageUrl != "" {
-		preg := `https:\/\/mhpic5\.lineinfo\.cn\/mh160tuku\/([a-z]*)\/([^_]*)_([0-9]*)\/([^_]*)_([0-9]*)\/00([0-9]*)\.jpg`
+		preg := `https:\/\/mhpic([5-7])\.lineinfo\.cn\/mh160tuku\/([a-z]*)\/([^_]*)_([0-9]*)\/([^_]*)_([0-9]*)\/00([0-9]*)\.jpg`
 		reg := regexp.MustCompile(preg)
 		test := reg.FindStringSubmatch(t.originImageUrl)
 		//fmt.Println(test, len(test))
 
-		if len(test) == 7 {
-			imgUrl1 = fmt.Sprintf(imgUrl, test[1], test[2], t.id, chapterName, originChapterId)
+		if len(test) == 8 {
+			realUrl = fmt.Sprintf(baseUrl, test[1], test[2], test[3], t.id, chapterName, originChapterId) + "00%s.jpg"
 		}
 	} else {
-		//https://mhpic5.lineinfo.cn/mh160tuku/%s/万界仙踪_31512/第100话_660572/
-		imgUrl2 := fmt.Sprintf(imgUrl, "%s", bookName, t.id, chapterName, originChapterId)
-		pathUrl := imgUrl2 + "0001.jpg"
-		chapterUrl := fmt.Sprintf("/kanmanhua/%d/%s.html", t.id, originChapterId)
+		realUrl = t.getImageUrl(baseUrl, bookName, chapterName, originChapterId, bookId)
 
-		for i := 122; i >= 97; i-- {
-			c := string(i)
-			//fmt.Println(c, i)
-			pathUrl2 := strings.Replace(fmt.Sprintf(pathUrl, c), " ", "", -1)
-			isRight := t.checkUrl(pathUrl2, chapterUrl)
-			if isRight {
-				//fmt.Println(pathUrl2)
-				imgUrl1 = strings.Replace(pathUrl2, "01.jpg", "%s.jpg", -1)
-				fmt.Printf("当前漫画的 PATH 是: %s\n", pathUrl2)
-				t.originImageUrl = pathUrl2
-
-				t.model.UpdateBookImageUrl(bookId, t.originImageUrl)
-				break
-			}
+		//fmt.Println(realUrl)
+		if realUrl != "" {
+			has = true
 		}
+		//fmt.Println("originImageUrl", t.originImageUrl)
 	}
 
 	if t.originImageUrl == "" {
+		t.model.DeleteChapter(chapterId)
 		log.Fatal("该话漫画暂时获取不到")
 	}
 
-	//imgUrl1 = fmt.Sprintf(imgUrl, bookName, t.id, chapterName, originChapterId) + "00%s.jpg"
-
-	imgUrl1 += "00%s.jpg"
-	//fmt.Println(imgUrl1)
+	//fmt.Println(realUrl)
 
 	images := t.model.Table.Images
 	images.Bid = bookId
@@ -261,8 +223,26 @@ func (t *mh160) detail(originChapterId string, bookId, chapterId, chapterNum int
 			fix = strconv.Itoa(i)
 		}
 
-		images.OriginUrl = strings.Replace(fmt.Sprintf(imgUrl1, fix), " ", "", -1)
+		images.OriginUrl = strings.Replace(fmt.Sprintf(realUrl, fix), " ", "", -1)
+
 		images.OrderId = i
+
+		if !has && i == 1 {
+			refererUrl := fmt.Sprintf("/kanmanhua/%d/%s.html", t.id, originChapterId)
+			isRight := t.checkUrl(images.OriginUrl, refererUrl)
+			if !isRight {
+				t.originImageUrl = ""
+
+				realUrl = t.getImageUrl(baseUrl, bookName, chapterName, originChapterId, bookId)
+
+				if realUrl == "" {
+					t.model.DeleteChapter(chapterId)
+					log.Fatal("该话漫画暂时获取不到")
+				}
+
+				images.OriginUrl = strings.Replace(fmt.Sprintf(realUrl, fix), " ", "", -1)
+			}
+		}
 
 		t.model.CreateImages(images)
 
@@ -276,9 +256,50 @@ func (t *mh160) detail(originChapterId string, bookId, chapterId, chapterNum int
 
 }
 
+func (t *mh160) getImageUrl(baseUrl, bookName, chapterName, originChapterId string, bookId int) (realUrl string) {
+	imageUrl := fmt.Sprintf(baseUrl, "%d", "%s", bookName, t.id, chapterName, originChapterId)
+	pathUrl := imageUrl + "0001.jpg"
+	chapterUrl := fmt.Sprintf("/kanmanhua/%d/%s.html", t.id, originChapterId)
+	//fmt.Println(chapterUrl)
+
+	var mhpic = [...]int{5, 6, 7}
+	var pathUrl2 string
+
+	for _, picNum := range mhpic {
+		for i := 122; i >= 97; i-- {
+			c := string(i)
+			//fmt.Println(picNum, c)
+			pathUrl2 = strings.Replace(fmt.Sprintf(pathUrl, picNum, c), " ", "", -1)
+
+			//fmt.Println(pathUrl2)
+
+			isRight := t.checkUrl(pathUrl2, chapterUrl)
+			if isRight {
+				//fmt.Println(pathUrl2)
+				realUrl = strings.Replace(pathUrl2, "01.jpg", "%s.jpg", -1)
+				fmt.Printf("当前漫画的 PATH 是: %s\n", pathUrl2)
+				t.originImageUrl = pathUrl2
+
+				t.model.UpdateBookImageUrl(bookId, t.originImageUrl)
+				break
+			}
+		}
+
+		if t.originImageUrl != "" {
+			break
+		}
+	}
+
+	if realUrl == "" {
+		fmt.Printf("获取漫画图片失败,此URL: %s\n", pathUrl2)
+	}
+
+	return
+}
+
 func (t *mh160) checkUrl(url, chapterUrl string) bool {
-	//str := "https://mhpic5.lineinfo.cn/mh160tuku/d/斗罗大陆2绝世唐门_11140/第162话诀别_660569/0002.jpg"
-	//fmt.Println(url,"\n", str)
+	//str := "https://mhpic6.lineinfo.cn/mh160tuku/d/斗罗大陆2绝世唐门_11140/第82话极动中的炽烈—天帝之锤_488477/0001.jpg"
+	//fmt.Println(url, "\n", str)
 	client := &http.Client{}
 
 	//提交请求
@@ -297,7 +318,7 @@ func (t *mh160) checkUrl(url, chapterUrl string) bool {
 	res, _ := client.Do(reqest)
 	defer res.Body.Close()
 
-	fmt.Println(res.StatusCode)
+	//fmt.Println(res.StatusCode)
 	if res.StatusCode != 200 {
 		//log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
 		return false

@@ -1,7 +1,6 @@
 package model
 
 import (
-	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
@@ -44,8 +43,13 @@ func (t *Comic) GetChapterList(bid int) (chapters []tb_chapter) {
 
 func (t *Comic) UpdateBookImageUrl(id int, url string) bool {
 	books := new(tb_books)
-	fmt.Println(id, url)
+	//fmt.Println(id, url)
 	t.Db.Model(&books).Where("id = ?", id).UpdateColumn("origin_image_url", url)
 
 	return true
+}
+
+func (t *Comic) DeleteChapter(id int) {
+	var chapter tb_chapter
+	t.Db.Where("id = ?", id).Delete(chapter)
 }

@@ -16,8 +16,8 @@ func (t *Init) Construct(db *gorm.DB) {
 	t.db = db
 	t.model.Db = db
 
-	t.getComicList()
-	//t.addBook(11140, "")
+	//t.getComicList()
+	t.addBook(11106, "")
 }
 
 func (t *Init) getComicList() {
