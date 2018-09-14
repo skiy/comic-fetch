@@ -3,26 +3,23 @@ package controller
 import (
 	"code.aliyun.com/skiystudy/comicFetch/model"
 	"fmt"
-	"github.com/jinzhu/gorm"
+	"github.com/go-redis/redis"
 	"strings"
 )
 
 type Init struct {
-	db    *gorm.DB
-	model model.Comic
+	Model model.Comic
+	Redis redis.Client
 }
 
-func (t *Init) Construct(db *gorm.DB) {
-	t.db = db
-	t.model.Db = db
-
-	//t.getComicList()
-	t.addBook(11106, "")
+func (t *Init) Construct() {
+	t.getComicList()
+	//t.addBook(11106, "")
 }
 
 func (t *Init) getComicList() {
-	comicList := t.model.GetBookList(0)
-	//fmt.Println(comicList)
+	comicList := t.Model.GetBookList(0)
+	fmt.Println(comicList)
 
 	comicTip := "漫画：%s (%d), %s\n"
 	for _, value := range comicList {
@@ -42,7 +39,7 @@ func (t *Init) getComicList() {
 
 		if strings.EqualFold(value.OriginWeb, "漫画160") {
 			var mh mh160
-			mh.db = t.model.Db
+			mh.db = t.Model.Db
 			mh.id = value.OriginBookId
 			mh.originImageUrl = value.OriginImageUrl
 			mh.Init()
@@ -52,7 +49,7 @@ func (t *Init) getComicList() {
 
 func (t *Init) addBook(id int, source string) {
 	var mh mh160
-	mh.db = t.model.Db
+	mh.db = t.Model.Db
 	mh.id = id
 	mh.Init()
 }
