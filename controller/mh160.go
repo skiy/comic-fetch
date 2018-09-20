@@ -138,7 +138,7 @@ func (t *mh160) mobileChapter() {
 			//图片
 			isAdd := t.detail(test[2], book.Id, chapterInfo.Id, chapterNum, bookName, chapterName, counts)
 
-			isAdd = true
+			//isAdd = true
 			if isAdd {
 				tk := "https://oapi.dingtalk.com/robot/send?access_token=8eaeec8ea1c97b646e85c89e884ff1cae5e5302991088f4a8d876268ce1bd59d"
 				post := `
