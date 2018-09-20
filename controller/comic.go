@@ -2,10 +2,10 @@ package controller
 
 import (
 	"code.aliyun.com/skiystudy/comicFetch/model"
+	"encoding/json"
 	"fmt"
 	"github.com/go-redis/redis"
 	"strings"
-	"encoding/json"
 )
 
 type Init struct {
@@ -15,7 +15,7 @@ type Init struct {
 
 /**
 抓取漫画初始化
- */
+*/
 func (t *Init) Construct() {
 	if t.Cache != nil {
 		t.newBooks()
@@ -24,8 +24,8 @@ func (t *Init) Construct() {
 }
 
 /**
-	检测新书
- */
+检测新书
+*/
 func (t *Init) newBooks() {
 	comicList := t.Model.GetBookList(0)
 
@@ -34,7 +34,7 @@ func (t *Init) newBooks() {
 	if err == nil {
 		//fmt.Println(v)
 		type m struct {
-			Id int `json:"id"`
+			Id   int    `json:"id"`
 			Flag string `json:"flag"`
 		}
 		var m1 []m
@@ -53,7 +53,7 @@ func (t *Init) newBooks() {
 
 				t.addMh160Book(v2.Id)
 				fmt.Printf("新增漫画ID(%d), 来源：<<%s>>\n", v2.Id, v2.Flag)
-				Next:
+			Next:
 			}
 
 			t.Cache.Do("del", cacheKey)
@@ -62,8 +62,8 @@ func (t *Init) newBooks() {
 }
 
 /**
-	获取漫画列表
- */
+获取漫画列表
+*/
 func (t *Init) getComicList() {
 	comicList := t.Model.GetBookList(0)
 	//fmt.Println(comicList)
@@ -96,7 +96,7 @@ func (t *Init) getComicList() {
 
 /**
 添加漫画160的漫画
- */
+*/
 func (t *Init) addMh160Book(id int) {
 	var mh mh160
 	mh.db = t.Model.Db

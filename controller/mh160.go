@@ -136,8 +136,47 @@ func (t *mh160) mobileChapter() {
 			chapterName = strings.Replace(chapterName, "/", "_", -1)
 
 			//图片
-			t.detail(test[2], book.Id, chapterInfo.Id, chapterNum, bookName, chapterName, counts)
-			//return
+			isAdd := t.detail(test[2], book.Id, chapterInfo.Id, chapterNum, bookName, chapterName, counts)
+
+			isAdd = true
+			if isAdd {
+				tk := "https://oapi.dingtalk.com/robot/send?access_token=8eaeec8ea1c97b646e85c89e884ff1cae5e5302991088f4a8d876268ce1bd59d"
+				post := `
+{
+     "msgtype": "text",
+     "text": {
+         "content": "漫画《%s》\n更新章节《%s》"
+     },
+     "at": {
+         "atMobiles": [
+             "%s"
+         ], 
+         "isAtAll": %s
+     }
+ }`
+				post = fmt.Sprintf(post, bookName, chapterName, "18565756628", "false")
+				//fmt.Println(post)
+				req, err := http.NewRequest("POST", tk, strings.NewReader(post))
+				if err != nil {
+					fmt.Println(err)
+				}
+
+				req.Header.Add("Content-Type", "application/json")
+				client := &http.Client{}
+				resp, err := client.Do(req)
+				if err != nil {
+					fmt.Println(err)
+				}
+
+				defer resp.Body.Close()
+				//
+				//body, err := ioutil.ReadAll(resp.Body)
+				//if err != nil {
+				//	fmt.Println(err)
+				//}
+				//
+				//fmt.Println(string(body))
+			}
 		}
 	})
 }
@@ -175,7 +214,7 @@ func (t *mh160) countImage(url string) (counts int) {
 /**
 获取漫画图片
 */
-func (t *mh160) detail(originChapterId string, bookId, chapterId, chapterNum int, bookName, chapterName string, counts int) {
+func (t *mh160) detail(originChapterId string, bookId, chapterId, chapterNum int, bookName, chapterName string, counts int) (isAdd bool) {
 	var realUrl string
 	var has bool
 
@@ -205,6 +244,8 @@ func (t *mh160) detail(originChapterId string, bookId, chapterId, chapterNum int
 	if t.originImageUrl == "" {
 		t.model.DeleteChapter(chapterId)
 		fmt.Println("该话漫画暂时获取不到")
+		isAdd = false
+		return
 	}
 
 	//fmt.Println(realUrl)
@@ -241,6 +282,8 @@ func (t *mh160) detail(originChapterId string, bookId, chapterId, chapterNum int
 				if realUrl == "" {
 					t.model.DeleteChapter(chapterId)
 					fmt.Println("该话漫画暂时获取不到")
+					isAdd = false
+					return
 				}
 
 				images.OriginUrl = strings.Replace(fmt.Sprintf(realUrl, fix), " ", "", -1)
@@ -248,14 +291,10 @@ func (t *mh160) detail(originChapterId string, bookId, chapterId, chapterNum int
 		}
 
 		t.model.CreateImages(images)
-
-		//fmt.Println(image)
-		//break
 	}
 
-	//url := "https://www.mh160.com/kanmanhua/31512/658683.html"
-	//https://mhpic5.lineinfo.cn/mh160tuku/w/%E4%B8%87%E7%95%8C%E4%BB%99%E8%B8%AA_31512/%E7%AC%AC97%E8%AF%9D_658683/0006.jpg
-	//https://mhpic5.lineinfo.cn/mh160tuku/w/万界仙踪_31512/第97话_658683/0007.jpg
+	isAdd = true
+	return
 
 }
 
