@@ -35,5 +35,5 @@ if (empty($chapterInfo)) {
 
 foreach ($chapterInfo as $key => $value) {
     $url = "chapter.php?book_id={$value['bid']}&chapter_id={$value['id']}";
-    echo "<a href='{$url}' target='_blank'>{$value['title']}</a> - ";
+    echo "<a href='{$url}' target='_blank'>{$value['title']}</a><br />";
 }

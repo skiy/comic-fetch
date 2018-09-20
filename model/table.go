@@ -12,6 +12,7 @@ type tb_books struct {
 	Status int
 	OriginUrl,
 	OriginWeb,
+	OriginFlag,
 	OriginImageUrl string
 	OriginBookId int
 	UpdatedAt,

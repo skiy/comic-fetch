@@ -20,12 +20,14 @@ type mh160 struct {
 	model model.Comic
 	db    *gorm.DB
 	originImageUrl,
-	originWeb string
+	originWeb,
+	originFlag string
 }
 
 func (t *mh160) Init() {
 	t.model.Db = t.db
 
+	t.originFlag = "mh160"
 	t.originWeb = "漫画160"
 	t.url = "https://m.mh160.com" //手机版
 
@@ -37,7 +39,7 @@ func (t *mh160) Init() {
 */
 func (t *mh160) mobileChapter() {
 	bookUrl := t.url + fmt.Sprintf("/kanmanhua/%d/", t.id)
-	fmt.Printf("\n正在采集漫画, URL: %s\n", bookUrl)
+	fmt.Printf("正在采集漫画, URL: %s\n", bookUrl)
 
 	doc := library.FetchSource(bookUrl)
 
@@ -48,7 +50,7 @@ func (t *mh160) mobileChapter() {
 		bookName = s.Find("h1").Text()
 	})
 
-	fmt.Printf("漫画名:《%s》\n\n", bookName)
+	fmt.Printf("漫画名:《%s》\n", bookName)
 
 	book := t.model.Table.Books
 	t.model.Db.Where("name = ?", bookName).First(&book)
@@ -60,6 +62,7 @@ func (t *mh160) mobileChapter() {
 		books.Status = 0
 		books.OriginUrl = bookUrl
 		books.OriginWeb = t.originWeb
+		books.OriginFlag = t.originFlag
 		books.OriginBookId = t.id
 		books.UpdatedAt = nowTime
 		books.CreatedAt = nowTime
@@ -162,7 +165,7 @@ func (t *mh160) countImage(url string) (counts int) {
 
 		counts, err = strconv.Atoi(test[2])
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
 		}
 	})
 
@@ -201,7 +204,7 @@ func (t *mh160) detail(originChapterId string, bookId, chapterId, chapterNum int
 
 	if t.originImageUrl == "" {
 		t.model.DeleteChapter(chapterId)
-		log.Fatal("该话漫画暂时获取不到")
+		fmt.Println("该话漫画暂时获取不到")
 	}
 
 	//fmt.Println(realUrl)
@@ -237,7 +240,7 @@ func (t *mh160) detail(originChapterId string, bookId, chapterId, chapterNum int
 
 				if realUrl == "" {
 					t.model.DeleteChapter(chapterId)
-					log.Fatal("该话漫画暂时获取不到")
+					fmt.Println("该话漫画暂时获取不到")
 				}
 
 				images.OriginUrl = strings.Replace(fmt.Sprintf(realUrl, fix), " ", "", -1)

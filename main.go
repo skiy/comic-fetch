@@ -16,16 +16,21 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	client := redis.NewClient(&redis.Options{
+	Comic := new(controller.Init)
+
+	cache := redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",
 		Password: "", // no password set
 		DB:       1,  // use default DB
 	})
 
-	pong, err := client.Ping().Result()
-	fmt.Println(pong, err)
+	pong, err := cache.Ping().Result()
+	if err != nil {
+		fmt.Println(pong, err)
+	} else {
+		Comic.Cache = cache
+	}
 
-	Comic := new(controller.Init)
 	Comic.Model.Db = dbh
 	Comic.Construct()
 
