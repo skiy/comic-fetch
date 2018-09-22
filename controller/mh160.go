@@ -69,6 +69,7 @@ func (t *mh160) mobileChapter() {
 		books.CreatedAt = nowTime
 
 		book = t.model.CreateBook(books)
+		fmt.Println(book)
 
 		if book.Id > 0 {
 			t.new = true

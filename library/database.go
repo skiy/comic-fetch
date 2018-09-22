@@ -6,10 +6,12 @@ import (
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"strings"
 )
 
 type Database struct {
+	Datatype string
 	DSN,
 	Dbhost,
 	Dbuser,
@@ -18,6 +20,9 @@ type Database struct {
 	Dbchar string
 }
 
+/**
+初始化数据库
+*/
 func (t *Database) Init(host, user, pwd, name, char string) {
 	t.Dbhost = host
 	t.Dbuser = user
@@ -34,10 +39,17 @@ func (t *Database) Init(host, user, pwd, name, char string) {
 	)
 }
 
+/**
+连接数据库
+*/
 func (t *Database) Connect() (db *gorm.DB, err error) {
 
-	if t.DSN != "" {
-		return gorm.Open("mysql", t.DSN)
+	if t.Datatype == "mysql" {
+		if t.DSN != "" {
+			return gorm.Open("mysql", t.DSN)
+		}
+	} else if t.Datatype == "sqlite" {
+		return gorm.Open("sqlite3", t.Dbname+".db")
 	}
 
 	return nil, errors.New("数据库连接失败")
