@@ -17,6 +17,7 @@ import (
 type mh160 struct {
 	id    int
 	url   string
+	new   bool
 	model model.Comic
 	db    *gorm.DB
 	originImageUrl,
@@ -68,6 +69,16 @@ func (t *mh160) mobileChapter() {
 		books.CreatedAt = nowTime
 
 		book = t.model.CreateBook(books)
+
+		if book.Id > 0 {
+			t.new = true
+
+			var msg library.Message
+			msg.IsOpen = true
+
+			//钉钉通知
+			msg.Dingtalk(1, bookName, t.originWeb)
+		}
 	}
 
 	chapterList := t.model.GetChapterList(book.Id)
@@ -77,108 +88,97 @@ func (t *mh160) mobileChapter() {
 	}
 	//fmt.Println(chapterIds)
 
+	type chapterInfo struct {
+		nameStr,
+		url string
+	}
+
+	var cList []chapterInfo
+	var cInfo chapterInfo
+
+	//抓取列表
 	doc.Find(".chapter-list ul li").Each(func(i int, s *goquery.Selection) { //手机版
-		chapterName := s.Find("a").Text()
-		url, _ := s.Find("a").Attr("href")
+		cInfo.nameStr = s.Find("a").Text()
+		cInfo.url, _ = s.Find("a").Attr("href")
 
-		//fmt.Printf("正在采集章节: %s, URL: %s \n", chapterName, t.url+url)
-
-		var err error
-		var chapterNum int
-
-		preg := `第([0-9]*)话`
-		re := regexp.MustCompile(preg)
-		test := re.FindStringSubmatch(chapterName)
-
-		if len(test) >= 2 {
-			//log.Fatalf("获取章节ID失败: %s %s", url, chapterName)
-			chapterNum, err = strconv.Atoi(test[1])
-			if err != nil {
-				log.Fatalf("章节转Int型失败: %s %s", test[1], chapterName)
-			}
-		}
-
-		//preg := `2[0-9-\s:]*`
-		preg = `/([0-9\/]*)/([0-9\.]*).html`
-		re = regexp.MustCompile(preg)
-		test = re.FindStringSubmatch(url)
-
-		if len(test) < 3 {
-			log.Fatalf("获取章节失败: %s", url)
-		}
-
-		var originChapterId int
-		originChapterId, err = strconv.Atoi(test[2])
-		if err != nil {
-			log.Fatalf("章节ID转Int型失败: %s %s", test[1], chapterName)
-		}
-
-		has := t.InArray(test[2], chapterIds)
-		if !has {
-			fmt.Printf("正在采集章节: %s, URL: %s \n", chapterName, t.url+url)
-
-			chapter := t.model.Table.Chapter
-			chapter.Bid = book.Id
-			chapter.ChapterId = chapterNum
-			chapter.Title = chapterName
-			chapter.OrderId = originChapterId
-			chapter.OriginUrl = t.url + url
-			chapter.CreatedAt = nowTime
-
-			chapterInfo := t.model.CreateChapter(chapter)
-
-			//获取共几话
-			counts := t.countImage(url)
-
-			chapterName = strings.Replace(chapterName, "-", "", -1)
-			chapterName = strings.Replace(chapterName, "，", "-", -1)
-			chapterName = strings.Replace(chapterName, "！", "-", -1)
-			chapterName = strings.Replace(chapterName, "/", "_", -1)
-
-			//图片
-			isAdd := t.detail(test[2], book.Id, chapterInfo.Id, chapterNum, bookName, chapterName, counts)
-
-			//isAdd = true
-			if isAdd {
-				tk := "https://oapi.dingtalk.com/robot/send?access_token=8eaeec8ea1c97b646e85c89e884ff1cae5e5302991088f4a8d876268ce1bd59d"
-				post := `
-{
-     "msgtype": "text",
-     "text": {
-         "content": "漫画《%s》\n更新章节《%s》"
-     },
-     "at": {
-         "atMobiles": [
-             "%s"
-         ], 
-         "isAtAll": %s
-     }
- }`
-				post = fmt.Sprintf(post, bookName, chapterName, "18565756628", "false")
-				//fmt.Println(post)
-				req, err := http.NewRequest("POST", tk, strings.NewReader(post))
-				if err != nil {
-					fmt.Println(err)
-				}
-
-				req.Header.Add("Content-Type", "application/json")
-				client := &http.Client{}
-				resp, err := client.Do(req)
-				if err != nil {
-					fmt.Println(err)
-				}
-
-				defer resp.Body.Close()
-				//
-				//body, err := ioutil.ReadAll(resp.Body)
-				//if err != nil {
-				//	fmt.Println(err)
-				//}
-				//
-				//fmt.Println(string(body))
-			}
-		}
+		cList = append(cList, cInfo)
 	})
+
+	cLen := len(cList)
+	if cLen > 0 {
+		var l = cLen - 1
+		for i := l; i > 0; i-- {
+			//fmt.Printf("正在采集章节: %s, URL: %s \n", chapterName, t.url+url)
+
+			chapterName := cList[i].nameStr
+			url := cList[i].url
+
+			var err error
+			var chapterNum int
+
+			preg := `第([0-9]*)话`
+			re := regexp.MustCompile(preg)
+			test := re.FindStringSubmatch(chapterName)
+
+			if len(test) >= 2 {
+				//log.Fatalf("获取章节ID失败: %s %s", url, chapterName)
+				chapterNum, err = strconv.Atoi(test[1])
+				if err != nil {
+					log.Fatalf("章节转Int型失败: %s %s", test[1], chapterName)
+				}
+			}
+
+			//preg := `2[0-9-\s:]*`
+			preg = `/([0-9\/]*)/([0-9\.]*).html`
+			re = regexp.MustCompile(preg)
+			test = re.FindStringSubmatch(url)
+
+			if len(test) < 3 {
+				log.Fatalf("获取章节失败: %s", url)
+			}
+
+			var originChapterId int
+			originChapterId, err = strconv.Atoi(test[2])
+			if err != nil {
+				log.Fatalf("章节ID转Int型失败: %s %s", test[1], chapterName)
+			}
+
+			has := t.InArray(test[2], chapterIds)
+			if !has {
+				fmt.Printf("正在采集章节: %s, URL: %s \n", chapterName, t.url+url)
+
+				chapter := t.model.Table.Chapter
+				chapter.Bid = book.Id
+				chapter.ChapterId = chapterNum
+				chapter.Title = chapterName
+				chapter.OrderId = i + 1
+				chapter.OriginId = originChapterId
+				chapter.OriginUrl = t.url + url
+				chapter.CreatedAt = nowTime
+
+				chapterInfo := t.model.CreateChapter(chapter)
+
+				//获取共几话
+				counts := t.countImage(url)
+
+				chapterName = strings.Replace(chapterName, "-", "", -1)
+				chapterName = strings.Replace(chapterName, "，", "-", -1)
+				chapterName = strings.Replace(chapterName, "！", "-", -1)
+				chapterName = strings.Replace(chapterName, "/", "_", -1)
+
+				//图片
+				isAdd := t.detail(test[2], book.Id, chapterInfo.Id, chapterNum, bookName, chapterName, counts)
+
+				//isAdd = true
+				//非新增漫画的章节更新
+				if isAdd && !t.new {
+					var msg library.Message
+					msg.IsOpen = true
+					msg.Dingtalk(2, bookName, chapterName)
+				}
+			}
+		}
+	}
 }
 
 /**

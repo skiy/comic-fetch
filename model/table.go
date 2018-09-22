@@ -23,8 +23,9 @@ type tb_chapter struct {
 	Id,
 	Bid,
 	ChapterId int
-	Title     string
-	OrderId   int
+	Title string
+	OrderId,
+	OriginId int
 	OriginUrl string
 	CreatedAt int64
 }

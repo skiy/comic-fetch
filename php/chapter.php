@@ -1,6 +1,7 @@
 <?php
 
 define('DEBUG', true);
+define('BASEPATH', __DIR__ . DIRECTORY_SEPARATOR);
 
 ini_set("display_errors", DEBUG);
 error_reporting(E_ALL);
@@ -12,7 +13,7 @@ if ($bookId <= 0 || $chapterId <= 0) {
     exit('漫画章节参数错误');
 }
 
-$dbh = new PDO('mysql:host=127.0.0.1;dbname=comic', 'root', '123456');
+include BASEPATH . 'db.php';
 
 $imageSql = "SELECT * FROM tb_images WHERE bid = :bid AND cid = :cid ORDER BY id ASC";
 $sth = $dbh->prepare($imageSql);

@@ -1,6 +1,7 @@
 <?php
 
 define('DEBUG', true);
+define('BASEPATH', __DIR__ . DIRECTORY_SEPARATOR);
 
 ini_set("display_errors", DEBUG);
 error_reporting(E_ALL);
@@ -12,7 +13,7 @@ if ($bookId <= 0) {
     exit('漫画编号参数错误');
 }
 
-$dbh = new PDO('mysql:host=127.0.0.1;dbname=comic', 'root', '123456');
+include 'db.php';
 
 $bookSql = "SELECT * FROM tb_books WHERE id = :id";
 $sth = $dbh->prepare($bookSql);
@@ -24,7 +25,7 @@ if ($bookInfo === false) {
 }
 
 $orderBy = ($orderBy == 0) ? 'DESC' : 'ASC';
-$chapterSql = "SELECT * FROM tb_chapters WHERE bid = :bid ORDER BY chapter_id {$orderBy}";
+$chapterSql = "SELECT * FROM tb_chapters WHERE bid = :bid ORDER BY id {$orderBy}";
 $sth = $dbh->prepare($chapterSql);
 $sth->execute(array(':bid' => $bookId));
 $chapterInfo = $sth->fetchAll();
