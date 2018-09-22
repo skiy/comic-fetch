@@ -13,8 +13,8 @@ type Config struct {
 }
 
 type setting struct {
-	Datatype,
-	Environment string
+	Datatype   string
+	Imagefetch bool
 }
 
 type mysql struct {
