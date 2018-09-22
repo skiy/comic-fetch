@@ -17,9 +17,7 @@ type Init struct {
 抓取漫画初始化
 */
 func (t *Init) Construct() {
-	if t.Cache != nil {
-		t.newBooks()
-	}
+	t.newBooks()
 	t.getComicList()
 }
 
@@ -30,7 +28,21 @@ func (t *Init) newBooks() {
 	comicList := t.Model.GetBookList(0)
 
 	cacheKey := "newbooks"
-	v, err := t.Cache.Do("get", cacheKey).String()
+
+	var v string
+	var err error
+
+	if t.Cache != nil {
+		v, err = t.Cache.Do("get", cacheKey).String()
+	} else {
+		//file 方式
+	}
+
+	//空数据
+	if v == "" {
+		return
+	}
+
 	if err == nil {
 		//fmt.Println(v)
 		type m struct {
