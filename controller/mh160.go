@@ -84,7 +84,7 @@ func (t *mh160) mobileChapter() {
 	chapterList := t.model.GetChapterList(book.Id)
 	var chapterIds []string
 	for _, value := range chapterList {
-		chapterIds = append(chapterIds, strconv.Itoa(value.OrderId))
+		chapterIds = append(chapterIds, strconv.Itoa(value.OriginId))
 	}
 	//fmt.Println(chapterIds)
 
@@ -107,8 +107,11 @@ func (t *mh160) mobileChapter() {
 	cLen := len(cList)
 	if cLen > 0 {
 		var l = cLen - 1
-		for i := l; i > 0; i-- {
+		var orderId = 0
+		for i := l; i >= 0; i-- {
 			//fmt.Printf("正在采集章节: %s, URL: %s \n", chapterName, t.url+url)
+
+			orderId++
 
 			chapterName := cList[i].nameStr
 			url := cList[i].url
@@ -143,6 +146,8 @@ func (t *mh160) mobileChapter() {
 				log.Fatalf("章节ID转Int型失败: %s %s", test[1], chapterName)
 			}
 
+			//fmt.Println(test[2], chapterIds)
+
 			has := t.InArray(test[2], chapterIds)
 			if !has {
 				fmt.Printf("正在采集章节: %s, URL: %s \n", chapterName, t.url+url)
@@ -151,7 +156,7 @@ func (t *mh160) mobileChapter() {
 				chapter.Bid = book.Id
 				chapter.ChapterId = chapterNum
 				chapter.Title = chapterName
-				chapter.OrderId = i + 1
+				chapter.OrderId = orderId
 				chapter.OriginId = originChapterId
 				chapter.OriginUrl = t.url + url
 				chapter.CreatedAt = nowTime
@@ -173,7 +178,7 @@ func (t *mh160) mobileChapter() {
 				//非新增漫画的章节更新
 				if isAdd && !t.new {
 					var msg library.Message
-					msg.IsOpen = true
+					msg.IsOpen = false
 					msg.Dingtalk(2, bookName, chapterName)
 				}
 			}
