@@ -41,3 +41,14 @@ type tb_images struct {
 	IsRemote int
 	CreatedAt int64
 }
+
+//采集图片
+type FtImages struct {
+	Bid,
+	Cid,
+	OrderId,
+	ImageUrl,
+	Name,
+	OriginUrl,
+	OriginFlag string
+}

@@ -304,6 +304,9 @@ func (t *mh160) detail(originChapterId string, bookId, chapterId, chapterNum int
 
 }
 
+/**
+获取图片地址
+ */
 func (t *mh160) getImageUrl(baseUrl, bookName, chapterName, originChapterId string, bookId int) (realUrl string) {
 	imageUrl := fmt.Sprintf(baseUrl, "%d", "%s", bookName, t.id, chapterName, originChapterId)
 	pathUrl := imageUrl + "0001.jpg"
@@ -345,6 +348,9 @@ func (t *mh160) getImageUrl(baseUrl, bookName, chapterName, originChapterId stri
 	return
 }
 
+/**
+检查图片地址是否准确
+ */
 func (t *mh160) checkUrl(url, chapterUrl string) bool {
 	//str := "https://mhpic6.lineinfo.cn/mh160tuku/d/斗罗大陆2绝世唐门_11140/第82话极动中的炽烈—天帝之锤_488477/0001.jpg"
 	//fmt.Println(url, "\n", str)
