@@ -49,5 +49,6 @@ func main() {
 	}
 
 	Comic.Model.Db = dbh
+	Comic.Conf = Conf
 	Comic.Construct()
 }

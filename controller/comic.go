@@ -10,12 +10,17 @@ import (
 	"io/ioutil"
 	"sync"
 	"runtime"
+	"code.aliyun.com/skiystudy/comicFetch/library"
+	"crypto/md5"
+	"net/http"
+	"io"
 )
 
 type Init struct {
 	Model model.Comic
 	Cache *redis.Client
 	Ftimage model.Table
+	Conf library.Config
 }
 
 /**
@@ -24,6 +29,7 @@ type Init struct {
 func (t *Init) Construct() {
 	//t.newBooks()
 	//t.getComicList()
+	fmt.Println(t.Conf.Mysql)
 	t.fetchImage()
 }
 
@@ -179,6 +185,22 @@ func (t *Init) fetchImage() {
 
 	tasks := make(chan model.FtImages, taskLoad)
 
+	fmt.Println(t.Conf.Image)
+
+	exist, err := library.PathExists(t.Conf.Image.Path)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	if ! exist {
+		err = os.MkdirAll(t.Conf.Image.Path, os.ModePerm)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+	}
+
 	wg.Add(cpuNum)
 	for qr := 1; qr <= cpuNum; qr ++ {
 		go t.worker(tasks, qr)
@@ -203,6 +225,65 @@ func (t *Init) worker (tasks chan model.FtImages, worker int)  {
 			return
 		}
 
-		fmt.Println(task.ImageUrl)
+		i := strings.LastIndex(task.ImageUrl,".")
+		suffix := task.ImageUrl[i:]
+
+		//filename, _ := fmt.Printf("%s-%s-%s %s", task.Bid, task.Cid, task.OrderId, suffix)
+		filename := fmt.Sprintf("%s-%s-%s", task.Bid, task.Cid, task.OrderId)
+		filenameBype := []byte(filename)
+		md5Filename := md5.Sum(filenameBype)
+		filename = fmt.Sprintf("%x%s", md5Filename, suffix)
+		fmt.Println(filename, suffix)
+		filepath := t.Conf.Image.Path + "/" + filename
+
+		exist, err := library.PathExists(filepath)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+
+		if exist {
+			continue
+		}
+
+		imageFile,err := os.Create(filepath)
+		if err != nil {
+			fmt.Printf("[writeImage create file]: fileName: %s\n href: %s\nerror: %s\n", filepath, task.ImageUrl, err.Error())
+			continue
+		}
+
+		client := &http.Client{}
+
+		//提交请求
+		reqest, err := http.NewRequest("GET", task.ImageUrl, nil)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+
+		//增加header选项
+		reqest.Header.Add("NT", "1")
+		reqest.Header.Add("If-Modified-Since", "Thu, 06 Sep 2018 03:54:19 GMT")
+		reqest.Header.Add("If-None-Match", "BDE9E8B0317BF99A37BE8FE52763AF1E")
+		reqest.Header.Add("Referer", task.OriginUrl)
+
+		//处理返回结果
+		res, _ := client.Do(reqest)
+
+		//fmt.Println(res.StatusCode)
+		if res.StatusCode != 200 {
+			fmt.Sprintf("status code error: %d %s", res.StatusCode, res.Status)
+			os.Remove(filepath)
+			continue
+		}
+
+		size,err := io.Copy(imageFile, res.Body)
+		if err != nil {
+			fmt.Printf("io.Copy: error: %s  href: %s\n", err.Error(), task.ImageUrl)
+			os.Remove(filepath)
+		}
+		fmt.Printf("Get From %s: %d bytes\n", task.ImageUrl, size)
+
+		//fmt.Println(task, suffix)
 	}
 }

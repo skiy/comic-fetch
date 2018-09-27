@@ -10,6 +10,7 @@ type Config struct {
 	Mysql   *mysql
 	Sqlite  *sqlite
 	Redis   *redis
+	Image *image
 }
 
 type setting struct {
@@ -34,6 +35,11 @@ type redis struct {
 	Port,
 	Password string
 	Db int
+}
+
+type image struct {
+	Path,
+	Nametype string
 }
 
 func (t *Config) ReadConfig() {
@@ -64,5 +70,11 @@ func (t *Config) ReadConfig() {
 	err = cfg.Section("Redis").MapTo(r)
 	if err == nil {
 		t.Redis = r
+	}
+
+	i := new(image)
+	err = cfg.Section("Image").MapTo(i)
+	if err == nil {
+		t.Image = i
 	}
 }

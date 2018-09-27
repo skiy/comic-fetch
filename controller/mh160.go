@@ -366,7 +366,7 @@ func (t *mh160) checkUrl(url, chapterUrl string) bool {
 	reqest.Header.Add("NT", "1")
 	reqest.Header.Add("If-Modified-Since", "Thu, 06 Sep 2018 03:54:19 GMT")
 	reqest.Header.Add("If-None-Match", "BDE9E8B0317BF99A37BE8FE52763AF1E")
-	reqest.Header.Add("Referer", t.url+chapterUrl)
+	reqest.Header.Add("Referer", t.url + chapterUrl)
 
 	//处理返回结果
 	res, _ := client.Do(reqest)
