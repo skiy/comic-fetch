@@ -8,7 +8,8 @@ type Table struct {
 
 type tb_books struct {
 	Id     int
-	Name   string
+	Name,
+	ImageUrl string
 	Status int
 	OriginUrl,
 	OriginWeb,

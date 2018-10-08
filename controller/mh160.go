@@ -20,6 +20,7 @@ type mh160 struct {
 	new   bool
 	model model.Comic
 	db    *gorm.DB
+	imageUrl,
 	originImageUrl,
 	originWeb,
 	originFlag string
@@ -51,6 +52,13 @@ func (t *mh160) mobileChapter() {
 		bookName = s.Find("h1").Text()
 	})
 
+	if t.imageUrl == "" {
+		bookImageTmp, isExist := doc.Find(".book-detail .thumb > img").Attr("src")
+		if isExist && bookImageTmp != "" {
+			t.imageUrl = bookImageTmp
+		}
+	}
+
 	fmt.Printf("漫画名:《%s》\n", bookName)
 
 	book := t.model.Table.Books
@@ -60,6 +68,7 @@ func (t *mh160) mobileChapter() {
 		books := t.model.Table.Books
 		//books.Id = t.id
 		books.Name = bookName
+		books.ImageUrl = t.imageUrl
 		books.Status = 0
 		books.OriginUrl = bookUrl
 		books.OriginWeb = t.originWeb
@@ -79,6 +88,12 @@ func (t *mh160) mobileChapter() {
 
 			//钉钉通知
 			msg.Dingtalk(1, bookName, t.originWeb)
+		}
+	} else {
+		if book.ImageUrl == "" {
+			b1 := t.model.Table.Books
+			b1.OriginImageUrl = t.imageUrl
+			t.model.UpdateBook(book.Id, b1)
 		}
 	}
 
@@ -331,7 +346,9 @@ func (t *mh160) getImageUrl(baseUrl, bookName, chapterName, originChapterId stri
 				fmt.Printf("当前漫画的 PATH 是: %s\n", pathUrl2)
 				t.originImageUrl = pathUrl2
 
-				t.model.UpdateBookImageUrl(bookId, t.originImageUrl)
+				book := t.model.Table.Books
+				book.OriginImageUrl = t.originImageUrl
+				t.model.UpdateBook(bookId, book)
 				break
 			}
 		}

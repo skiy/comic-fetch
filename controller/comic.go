@@ -27,9 +27,8 @@ type Init struct {
 抓取漫画初始化
 */
 func (t *Init) Construct() {
-	//t.newBooks()
-	//t.getComicList()
-	fmt.Println(t.Conf.Mysql)
+	t.newBooks()
+	t.getComicList()
 	t.fetchImage()
 }
 
@@ -145,6 +144,7 @@ func (t *Init) getComicList() {
 			var mh mh160
 			mh.db = t.Model.Db
 			mh.id = value.OriginBookId
+			mh.imageUrl = value.ImageUrl
 			mh.originImageUrl = value.OriginImageUrl
 			mh.Init()
 		}
@@ -179,6 +179,7 @@ func (t *Init) fetchImage() {
 	//}
 
 	taskLoad = len(list)
+	fmt.Println(taskLoad)
 	cpuNum = runtime.NumCPU()
 
 	fmt.Println(taskLoad, cpuNum)
