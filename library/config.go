@@ -15,7 +15,7 @@ type Config struct {
 
 type setting struct {
 	Datatype   string
-	Imagefetch bool
+	ImageFetch bool
 }
 
 type mysql struct {

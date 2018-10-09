@@ -29,7 +29,11 @@ type Init struct {
 func (t *Init) Construct() {
 	t.newBooks()
 	t.getComicList()
-	t.fetchImage()
+
+	//采集远程图片到本地
+	if t.Conf.Setting.ImageFetch {
+		t.fetchImage()
+	}
 }
 
 /**
