@@ -22,8 +22,10 @@ type mh160 struct {
 	db    *gorm.DB
 	imageUrl,
 	originImageUrl,
+	originPathUrl,
 	originWeb,
 	originFlag string
+	fetchLocal bool
 }
 
 func (t *mh160) Init() {
@@ -55,7 +57,7 @@ func (t *mh160) mobileChapter() {
 	if t.imageUrl == "" {
 		bookImageTmp, isExist := doc.Find(".book-detail .thumb > img").Attr("src")
 		if isExist && bookImageTmp != "" {
-			t.imageUrl = bookImageTmp
+			t.originImageUrl = bookImageTmp
 		}
 	}
 
@@ -68,8 +70,8 @@ func (t *mh160) mobileChapter() {
 		books := t.model.Table.Books
 		//books.Id = t.id
 		books.Name = bookName
-		books.ImageUrl = t.imageUrl
 		books.Status = 0
+		books.OriginImageUrl = t.originImageUrl
 		books.OriginUrl = bookUrl
 		books.OriginWeb = t.originWeb
 		books.OriginFlag = t.originFlag
@@ -90,9 +92,10 @@ func (t *mh160) mobileChapter() {
 			msg.Dingtalk(1, bookName, t.originWeb)
 		}
 	} else {
-		if book.ImageUrl == "" {
+		if t.fetchLocal && book.OriginImageUrl != "" && book.ImageUrl == "" {
 			b1 := t.model.Table.Books
-			b1.OriginImageUrl = t.imageUrl
+			b1.ImageUrl = "localhost"
+			b1.UpdatedAt = time.Now().Unix()
 			t.model.UpdateBook(book.Id, b1)
 		}
 	}
@@ -240,13 +243,12 @@ func (t *mh160) detail(originChapterId string, bookId, chapterId, chapterNum int
 	var has bool
 
 	baseUrl := "https://mhpic%s.lineinfo.cn/mh160tuku/%s/%s_%d/%s_%s/"
-	//fmt.Println("originImageUrl", t.originImageUrl)
 
 	//有源
-	if t.originImageUrl != "" {
+	if t.originPathUrl != "" {
 		preg := `https:\/\/mhpic([5-7])\.lineinfo\.cn\/mh160tuku\/([a-z]*)\/([^_]*)_([0-9]*)\/([^_]*)_([0-9]*)\/00([0-9]*)\.jpg`
 		reg := regexp.MustCompile(preg)
-		test := reg.FindStringSubmatch(t.originImageUrl)
+		test := reg.FindStringSubmatch(t.originPathUrl)
 		//fmt.Println(test, len(test))
 
 		if len(test) == 8 {
@@ -259,10 +261,9 @@ func (t *mh160) detail(originChapterId string, bookId, chapterId, chapterNum int
 		if realUrl != "" {
 			has = true
 		}
-		//fmt.Println("originImageUrl", t.originImageUrl)
 	}
 
-	if t.originImageUrl == "" {
+	if t.originPathUrl == "" {
 		t.model.DeleteChapter(chapterId)
 		fmt.Println("该话漫画暂时获取不到")
 		isAdd = false
@@ -296,7 +297,7 @@ func (t *mh160) detail(originChapterId string, bookId, chapterId, chapterNum int
 			refererUrl := fmt.Sprintf("/kanmanhua/%d/%s.html", t.id, originChapterId)
 			isRight := t.checkUrl(images.OriginUrl, refererUrl)
 			if !isRight {
-				t.originImageUrl = ""
+				t.originPathUrl = ""
 
 				realUrl = t.getImageUrl(baseUrl, bookName, chapterName, originChapterId, bookId)
 
@@ -344,16 +345,17 @@ func (t *mh160) getImageUrl(baseUrl, bookName, chapterName, originChapterId stri
 				//fmt.Println(pathUrl2)
 				realUrl = strings.Replace(pathUrl2, "01.jpg", "%s.jpg", -1)
 				fmt.Printf("当前漫画的 PATH 是: %s\n", pathUrl2)
-				t.originImageUrl = pathUrl2
+				t.originPathUrl = pathUrl2
 
 				book := t.model.Table.Books
-				book.OriginImageUrl = t.originImageUrl
+				book.OriginPathUrl = t.originPathUrl
+				book.UpdatedAt = time.Now().Unix()
 				t.model.UpdateBook(bookId, book)
 				break
 			}
 		}
 
-		if t.originImageUrl != "" {
+		if t.originPathUrl != "" {
 			break
 		}
 	}

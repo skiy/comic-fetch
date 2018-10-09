@@ -14,6 +14,7 @@ type tb_books struct {
 	OriginUrl, //漫画地址
 	OriginWeb, //源站名
 	OriginFlag, //源站标识
+	OriginPathUrl, //上次采集图片实际路径
 	OriginImageUrl string //源站漫画图标地址
 	OriginBookId int //本书ID
 	UpdatedAt, //更新时间

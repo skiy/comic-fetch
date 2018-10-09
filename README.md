@@ -8,7 +8,7 @@
 ### 使用说明
 - 新增漫画：
 向 redis db1 添加数据（格式） ```set newbooks '[{"id":25510,"flag":"mh160"},{"id":11106,"flag":"mh160"},{"id":11105,"flag":"mh160"}]'```
-或向 newbooks.json 文件添加数据 (格式) ```[{"id":25510,"flag":"mh160"},{"id":11106,"flag":"mh160"},{"id":11105,"flag":"mh160"}]```
+或向 newbooks.json 文件添加数据 (格式) ```[{"id":31512,"flag":"mh160"},{"id":11106,"flag":"mh160"},{"id":11105,"flag":"mh160"}]```
 
 - 更新漫画
 使用 ```go run main.go``` 运行本项目

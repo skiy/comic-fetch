@@ -103,7 +103,7 @@ func (t *Init) newBooks() {
 				if v2.Flag == "mh160" {
 					t.addMh160Book(v2.Id)
 				}
-				fmt.Printf("新增漫画ID(%d), 来源：<<%s>>\n", v2.Id, v2.Flag)
+				fmt.Printf("\n新增漫画ID(%d), 来源：<<%s>>\n", v2.Id, v2.Flag)
 			Next:
 			}
 
@@ -150,6 +150,8 @@ func (t *Init) getComicList() {
 			mh.id = value.OriginBookId
 			mh.imageUrl = value.ImageUrl
 			mh.originImageUrl = value.OriginImageUrl
+			mh.originPathUrl = value.OriginPathUrl
+			mh.fetchLocal = t.Conf.Setting.ImageFetch
 			mh.Init()
 		}
 	}
