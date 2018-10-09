@@ -21,6 +21,7 @@ type mh160 struct {
 	model model.Comic
 	db    *gorm.DB
 	imageUrl,
+	filePath, //文件保存路径
 	originImageUrl,
 	originPathUrl,
 	originWeb,
@@ -94,9 +95,14 @@ func (t *mh160) mobileChapter() {
 	} else {
 		if t.fetchLocal && book.OriginImageUrl != "" && book.ImageUrl == "" {
 			b1 := t.model.Table.Books
-			b1.ImageUrl = "localhost"
-			b1.UpdatedAt = time.Now().Unix()
-			t.model.UpdateBook(book.Id, b1)
+
+			err, imageUrl, _ := library.FetchFile(book.OriginImageUrl, t.filePath, book.OriginUrl)
+
+			if err == nil {
+				b1.ImageUrl = imageUrl
+				b1.UpdatedAt = time.Now().Unix()
+				t.model.UpdateBook(book.Id, b1)
+			}
 		}
 	}
 
@@ -277,6 +283,7 @@ func (t *mh160) detail(originChapterId string, bookId, chapterId, chapterNum int
 	images.Cid = chapterId
 	images.ChapterId = chapterNum
 	images.ImageUrl = ""
+	images.Size = 0
 	images.IsRemote = 1
 	images.CreatedAt = time.Now().Unix()
 
@@ -322,7 +329,7 @@ func (t *mh160) detail(originChapterId string, bookId, chapterId, chapterNum int
 
 /**
 获取图片地址
- */
+*/
 func (t *mh160) getImageUrl(baseUrl, bookName, chapterName, originChapterId string, bookId int) (realUrl string) {
 	imageUrl := fmt.Sprintf(baseUrl, "%d", "%s", bookName, t.id, chapterName, originChapterId)
 	pathUrl := imageUrl + "0001.jpg"
@@ -369,7 +376,7 @@ func (t *mh160) getImageUrl(baseUrl, bookName, chapterName, originChapterId stri
 
 /**
 检查图片地址是否准确
- */
+*/
 func (t *mh160) checkUrl(url, chapterUrl string) bool {
 	//str := "https://mhpic6.lineinfo.cn/mh160tuku/d/斗罗大陆2绝世唐门_11140/第82话极动中的炽烈—天帝之锤_488477/0001.jpg"
 	//fmt.Println(url, "\n", str)
@@ -385,7 +392,7 @@ func (t *mh160) checkUrl(url, chapterUrl string) bool {
 	reqest.Header.Add("NT", "1")
 	reqest.Header.Add("If-Modified-Since", "Thu, 06 Sep 2018 03:54:19 GMT")
 	reqest.Header.Add("If-None-Match", "BDE9E8B0317BF99A37BE8FE52763AF1E")
-	reqest.Header.Add("Referer", t.url + chapterUrl)
+	reqest.Header.Add("Referer", t.url+chapterUrl)
 
 	//处理返回结果
 	res, _ := client.Do(reqest)

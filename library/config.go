@@ -10,7 +10,7 @@ type Config struct {
 	Mysql   *mysql
 	Sqlite  *sqlite
 	Redis   *redis
-	Image *image
+	Image   *image
 }
 
 type setting struct {

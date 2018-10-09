@@ -1,26 +1,27 @@
 package controller
 
 import (
+	"code.aliyun.com/skiystudy/comicFetch/library"
 	"code.aliyun.com/skiystudy/comicFetch/model"
+	"crypto/md5"
 	"encoding/json"
 	"fmt"
 	"github.com/go-redis/redis"
-	"strings"
-	"os"
-	"io/ioutil"
-	"sync"
-	"runtime"
-	"code.aliyun.com/skiystudy/comicFetch/library"
-	"crypto/md5"
-	"net/http"
 	"io"
+	"io/ioutil"
+	"net/http"
+	"os"
+	"runtime"
+	"strconv"
+	"strings"
+	"sync"
 )
 
 type Init struct {
-	Model model.Comic
-	Cache *redis.Client
+	Model   model.Comic
+	Cache   *redis.Client
 	Ftimage model.Table
-	Conf library.Config
+	Conf    library.Config
 }
 
 /**
@@ -152,6 +153,7 @@ func (t *Init) getComicList() {
 			mh.originImageUrl = value.OriginImageUrl
 			mh.originPathUrl = value.OriginPathUrl
 			mh.fetchLocal = t.Conf.Setting.ImageFetch
+			mh.filePath = t.Conf.Image.Path
 			mh.Init()
 		}
 	}
@@ -168,9 +170,9 @@ func (t *Init) addMh160Book(id int) {
 }
 
 var (
-	wg sync.WaitGroup
- 	taskLoad int
- 	cpuNum int
+	wg       sync.WaitGroup
+	taskLoad int
+	cpuNum   int
 )
 
 func (t *Init) fetchImage() {
@@ -200,7 +202,7 @@ func (t *Init) fetchImage() {
 		return
 	}
 
-	if ! exist {
+	if !exist {
 		err = os.MkdirAll(t.Conf.Image.Path, os.ModePerm)
 		if err != nil {
 			fmt.Println(err)
@@ -209,7 +211,7 @@ func (t *Init) fetchImage() {
 	}
 
 	wg.Add(cpuNum)
-	for qr := 1; qr <= cpuNum; qr ++ {
+	for qr := 1; qr <= cpuNum; qr++ {
 		go t.worker(tasks, qr)
 	}
 
@@ -222,7 +224,7 @@ func (t *Init) fetchImage() {
 	wg.Wait()
 }
 
-func (t *Init) worker (tasks chan model.FtImages, worker int)  {
+func (t *Init) worker(tasks chan model.FtImages, worker int) {
 	defer wg.Done()
 
 	for {
@@ -232,7 +234,7 @@ func (t *Init) worker (tasks chan model.FtImages, worker int)  {
 			return
 		}
 
-		i := strings.LastIndex(task.ImageUrl,".")
+		i := strings.LastIndex(task.ImageUrl, ".")
 		suffix := task.ImageUrl[i:]
 
 		//filename, _ := fmt.Printf("%s-%s-%s %s", task.Bid, task.Cid, task.OrderId, suffix)
@@ -240,7 +242,7 @@ func (t *Init) worker (tasks chan model.FtImages, worker int)  {
 		filenameBype := []byte(filename)
 		md5Filename := md5.Sum(filenameBype)
 		filename = fmt.Sprintf("%x%s", md5Filename, suffix)
-		fmt.Println(filename, suffix)
+		//fmt.Println(filename, suffix)
 		filepath := t.Conf.Image.Path + "/" + filename
 
 		exist, err := library.PathExists(filepath)
@@ -253,7 +255,7 @@ func (t *Init) worker (tasks chan model.FtImages, worker int)  {
 			continue
 		}
 
-		imageFile,err := os.Create(filepath)
+		imageFile, err := os.Create(filepath)
 		if err != nil {
 			fmt.Printf("[writeImage create file]: fileName: %s\n href: %s\nerror: %s\n", filepath, task.ImageUrl, err.Error())
 			continue
@@ -284,7 +286,7 @@ func (t *Init) worker (tasks chan model.FtImages, worker int)  {
 			continue
 		}
 
-		size,err := io.Copy(imageFile, res.Body)
+		size, err := io.Copy(imageFile, res.Body)
 		if err != nil {
 			fmt.Printf("io.Copy: error: %s  href: %s\n", err.Error(), task.ImageUrl)
 			os.Remove(filepath)
@@ -292,5 +294,11 @@ func (t *Init) worker (tasks chan model.FtImages, worker int)  {
 		fmt.Printf("Get From %s: %d bytes\n", task.ImageUrl, size)
 
 		//fmt.Println(task, suffix)
+		image := t.Model.Table.Images
+		image.ImageUrl = filepath
+		image.Size = size
+
+		tid, _ := strconv.Atoi(task.Id)
+		t.Model.UpdateImage(tid, image)
 	}
 }

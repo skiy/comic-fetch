@@ -36,7 +36,7 @@ func (t *Comic) GetBookList(id int) (books []tb_books) {
 
 func (t *Comic) FetchImageList() (images []FtImages) {
 	//sql := "SELECT i.bid,i.cid,i.order_id,i.origin_url,b.name,b.origin_url,b.origin_flag FROM tb_images AS i LEFT JOIN tb_books b ON b.id = i.bid WHERE I.image_url = '' ORDER BY i.id ASC" .Limit(10)
-	t.Db.Table("tb_images AS i").Select("i.bid,i.cid,i.order_id,i.origin_url AS image_url,b.name,b.origin_url,b.origin_flag").Joins("LEFT JOIN tb_books b ON b.id = i.bid").Where("i.image_url = ''").Order("i.id ASC").Scan(&images)
+	t.Db.Table("tb_images AS i").Select("i.id,i.bid,i.cid,i.order_id,i.origin_url AS image_url,b.name,b.origin_url,b.origin_flag").Joins("LEFT JOIN tb_books b ON b.id = i.bid").Where("i.image_url = ''").Order("i.id ASC").Scan(&images)
 	return
 }
 
@@ -48,10 +48,22 @@ func (t *Comic) GetChapterList(bid int) (chapters []tb_chapter) {
 	return
 }
 
+/**
+更新漫画
+*/
 func (t *Comic) UpdateBook(id int, book tb_books) bool {
 	books := new(tb_books)
-	//fmt.Println(id, url)
 	t.Db.Model(&books).Where("id = ?", id).Updates(book)
+
+	return true
+}
+
+/**
+更新图片
+*/
+func (t *Comic) UpdateImage(id int, image tb_images) bool {
+	images := new(tb_images)
+	t.Db.Model(&images).Where("id = ?", id).Updates(image)
 
 	return true
 }

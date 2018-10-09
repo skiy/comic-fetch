@@ -8,7 +8,7 @@ func Log() {
 
 /**
 文件(夹)路径是否存在
- */
+*/
 func PathExists(path string) (bool, error) {
 	_, err := os.Stat(path)
 	if err == nil {
