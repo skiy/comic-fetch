@@ -100,7 +100,7 @@ func (t *mh160) mobileChapter() {
 
 			if err == nil {
 				b1.ImageUrl = imageUrl
-				b1.UpdatedAt = time.Now().Unix()
+				b1.UpdatedAt = nowTime
 				t.model.UpdateBook(book.Id, b1)
 			}
 		}
@@ -339,6 +339,7 @@ func (t *mh160) getImageUrl(baseUrl, bookName, chapterName, originChapterId stri
 	var mhpic = [...]int{5, 6, 7}
 	var pathUrl2 string
 
+	nowTime := time.Now().Unix()
 	for _, picNum := range mhpic {
 		for i := 122; i >= 97; i-- {
 			c := string(i)
@@ -356,7 +357,7 @@ func (t *mh160) getImageUrl(baseUrl, bookName, chapterName, originChapterId stri
 
 				book := t.model.Table.Books
 				book.OriginPathUrl = t.originPathUrl
-				book.UpdatedAt = time.Now().Unix()
+				book.UpdatedAt = nowTime
 				t.model.UpdateBook(bookId, book)
 				break
 			}
