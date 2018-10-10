@@ -81,7 +81,6 @@ func (t *mh160) mobileChapter() {
 		books.CreatedAt = nowTime
 
 		book = t.model.CreateBook(books)
-		fmt.Println(book)
 
 		if book.Id > 0 {
 			t.new = true
@@ -98,6 +97,7 @@ func (t *mh160) mobileChapter() {
 
 			err, imageUrl, _ := library.FetchFile(book.OriginImageUrl, t.filePath, book.OriginUrl)
 
+			//fmt.Println(nowTime)
 			if err == nil {
 				b1.ImageUrl = imageUrl
 				b1.UpdatedAt = nowTime

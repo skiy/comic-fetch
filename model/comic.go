@@ -53,7 +53,7 @@ func (t *Comic) GetChapterList(bid int) (chapters []tb_chapter) {
 */
 func (t *Comic) UpdateBook(id int, book tb_books) bool {
 	books := new(tb_books)
-	t.Db.Model(&books).Where("id = ?", id).Updates(book)
+	t.Db.Model(&books).Where("id = ?", id).UpdateColumns(book)
 
 	return true
 }
@@ -63,7 +63,7 @@ func (t *Comic) UpdateBook(id int, book tb_books) bool {
 */
 func (t *Comic) UpdateImage(id int, image tb_images) bool {
 	images := new(tb_images)
-	t.Db.Model(&images).Where("id = ?", id).Updates(image)
+	t.Db.Model(&images).Where("id = ?", id).UpdateColumns(image)
 
 	return true
 }

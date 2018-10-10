@@ -2,7 +2,6 @@ package library
 
 import (
 	"crypto/md5"
-	"errors"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/axgle/mahonia"
@@ -74,7 +73,10 @@ func FetchFile(url, imagePath, referer string) (err error, fullpath string, size
 	}
 
 	if exist {
-		err = errors.New("文件已存在")
+		//err = errors.New("文件已存在")
+		fmt.Println("文件已存在")
+		err = nil
+		fullpath = filename
 		return
 	}
 
@@ -117,6 +119,6 @@ func FetchFile(url, imagePath, referer string) (err error, fullpath string, size
 	}
 	fmt.Printf("Get From %s: %d bytes\n", url, size)
 
-	fullpath = filepath
+	fullpath = filename
 	return
 }

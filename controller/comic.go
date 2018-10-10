@@ -252,6 +252,12 @@ func (t *Init) worker(tasks chan model.FtImages, worker int) {
 		}
 
 		if exist {
+			image := t.Model.Table.Images
+			image.ImageUrl = filename
+
+			tid, _ := strconv.Atoi(task.Id)
+			t.Model.UpdateImage(tid, image)
+
 			continue
 		}
 
@@ -295,7 +301,7 @@ func (t *Init) worker(tasks chan model.FtImages, worker int) {
 
 		//fmt.Println(task, suffix)
 		image := t.Model.Table.Images
-		image.ImageUrl = filepath
+		image.ImageUrl = filename
 		image.Size = size
 
 		tid, _ := strconv.Atoi(task.Id)
