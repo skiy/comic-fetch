@@ -19,7 +19,20 @@ $bookSql = "SELECT * FROM tb_books WHERE id = :id";
 $sth = $dbh->prepare($bookSql);
 $sth->execute(array(':id' => $bookId));
 $bookInfo = $sth->fetch();
+?>
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+    <!-- Bootstrap CSS -->
+
+    <title>第五城市漫画网</title>
+</head>
+<body>
+<?php
 if ($bookInfo === false) {
     exit('漫画不存在');
 }
@@ -38,3 +51,6 @@ foreach ($chapterInfo as $key => $value) {
     $url = "chapter.php?book_id={$value['bid']}&chapter_id={$value['id']}";
     echo "<a href='{$url}' target='_blank'>{$value['title']}</a><br />";
 }
+?>
+</body>
+</html>

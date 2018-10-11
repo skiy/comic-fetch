@@ -9,6 +9,20 @@ error_reporting(E_ALL);
 $bookId = $_GET['book_id'] ?? '';
 $chapterId = $_GET['chapter_id'] ?? '';
 
+?>
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+
+    <title>第五城市漫画网</title>
+</head>
+<body>
+<?php
 if ($bookId <= 0 || $chapterId <= 0) {
     exit('漫画章节参数错误');
 }
@@ -26,8 +40,13 @@ if (empty($imageInfo)) {
 
 foreach ($imageInfo as $key => $value) {
     $url = $value['image_url'];
-    if ($value['is_remote'] == 1) {
+    if (empty($value['image_url'])) {
         $url = 'img.php?url=' . $value['origin_url'];
+    } else {
+        $url = "images/{$value['image_url']}";
     }
     echo "<img src='{$url}' /><br />";
 }
+?>
+</body>
+</html>
