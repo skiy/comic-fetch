@@ -203,7 +203,7 @@ func (t *mh160) mobileChapter() {
 				//非新增漫画的章节更新
 				if isAdd && !t.new {
 					var msg library.Message
-					msg.IsOpen = false
+					msg.IsOpen = true
 					msg.Dingtalk(2, bookName, chapterName)
 				}
 			}

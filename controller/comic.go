@@ -63,13 +63,13 @@ func (t *Init) newBooks() {
 	} else {
 		//file 方式
 		if _, err := os.Stat(filepath); os.IsNotExist(err) {
-			fmt.Println(1, err)
+			fmt.Println("Load cache filepath fail", err)
 			return
 		}
 
 		str, err = ioutil.ReadFile(filepath)
 		if err != nil {
-			fmt.Println(2, err)
+			fmt.Println("Read cache filepath fail", err)
 			return
 		}
 

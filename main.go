@@ -20,7 +20,6 @@ func main() {
 	db.Datatype = s.Datatype
 
 	if s.Datatype == "mysql" {
-		fmt.Println(Conf.Mysql)
 		db.Init(Conf.Mysql.Host, Conf.Mysql.User, Conf.Mysql.Password, Conf.Mysql.Name, Conf.Mysql.Char)
 	} else if s.Datatype == "sqlite" {
 		db.Init("", "", "", Conf.Sqlite.Name, "")
@@ -30,7 +29,7 @@ func main() {
 	defer dbh.Close()
 
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln("Db connect fail", err)
 	}
 
 	Comic := new(controller.Init)

@@ -12,6 +12,7 @@ type Message struct {
 
 /**
 钉钉通知
+flag 1新增漫画, 2更新漫画
 */
 func (t *Message) Dingtalk(flag int, params ...string) (notice bool) {
 	if !t.IsOpen {

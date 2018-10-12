@@ -1,8 +1,8 @@
 package library
 
 import (
-	"fmt"
 	"github.com/go-ini/ini"
+	"log"
 )
 
 type Config struct {
@@ -43,9 +43,20 @@ type image struct {
 }
 
 func (t *Config) ReadConfig() {
-	cfg, err := ini.Load("conf.ini")
+	realpath, err := GetCurrentDirectory()
 	if err != nil {
-		fmt.Println(err)
+		log.Fatalln(err)
+	}
+
+	confpath := realpath + "/conf.ini"
+	cfg, err := ini.Load(confpath)
+
+	if err != nil {
+		cfg, err = ini.Load("conf.ini")
+	}
+
+	if err != nil {
+		log.Fatalln("Load conf.ini fail", err)
 	}
 
 	s := new(setting)
