@@ -1,8 +1,8 @@
 package main
 
 import (
-	"code.aliyun.com/skiystudy/comicFetch/controller"
-	"code.aliyun.com/skiystudy/comicFetch/library"
+	"github.com/skiy/comicFetch/controller"
+	"github.com/skiy/comicFetch/library"
 	"fmt"
 	"github.com/go-redis/redis"
 	"log"

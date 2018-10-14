@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"code.aliyun.com/skiystudy/comicFetch/library"
-	"code.aliyun.com/skiystudy/comicFetch/model"
+	"github.com/skiy/comicFetch/library"
+	"github.com/skiy/comicFetch/model"
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
