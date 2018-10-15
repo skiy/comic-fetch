@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/skiy/comicFetch/controller"
-	"github.com/skiy/comicFetch/library"
 	"fmt"
 	"github.com/go-redis/redis"
+	"github.com/skiy/comicFetch/controller"
+	"github.com/skiy/comicFetch/library"
 	"log"
 )
 

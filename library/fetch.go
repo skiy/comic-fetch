@@ -1,7 +1,6 @@
 package library
 
 import (
-	"crypto/md5"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/axgle/mahonia"
@@ -40,7 +39,7 @@ func FetchSource(url string) (doc *goquery.Document) {
 /**
 下载文件
 */
-func FetchFile(url, imagePath, referer string) (err error, fullpath string, size int64) {
+func FetchFile(url, filename, imagePath, referer string) (err error, fullpath string, size int64) {
 	exist, err := PathExists(imagePath)
 	if err != nil {
 		fmt.Println(err)
@@ -57,13 +56,15 @@ func FetchFile(url, imagePath, referer string) (err error, fullpath string, size
 
 	i := strings.LastIndex(url, ".")
 	j := strings.LastIndex(url, "-")
-	suffix := url[i:j]
 
-	filename := url
-	filenameBype := []byte(filename)
-	md5Filename := md5.Sum(filenameBype)
-	filename = fmt.Sprintf("%x%s", md5Filename, suffix)
-	//fmt.Println(filename, suffix)
+	var suffix string
+	if j > 0 {
+		suffix = url[i:j]
+	} else {
+		suffix = url[i:]
+	}
+
+	filename += suffix
 	filepath := imagePath + "/" + filename
 
 	exist, err = PathExists(filepath)
@@ -74,7 +75,7 @@ func FetchFile(url, imagePath, referer string) (err error, fullpath string, size
 
 	if exist {
 		//err = errors.New("文件已存在")
-		fmt.Println("文件已存在")
+		fmt.Println(filename + " 文件已存在")
 		err = nil
 		fullpath = filename
 		return

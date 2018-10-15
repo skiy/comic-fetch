@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
@@ -63,6 +64,7 @@ func (t *Comic) UpdateBook(id int, book tb_books) bool {
 */
 func (t *Comic) UpdateImage(id int, image tb_images) bool {
 	images := new(tb_images)
+	fmt.Println(image)
 	t.Db.Model(&images).Where("id = ?", id).UpdateColumns(image)
 
 	return true

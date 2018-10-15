@@ -1,15 +1,12 @@
 package controller
 
 import (
-	"github.com/skiy/comicFetch/library"
-	"github.com/skiy/comicFetch/model"
-	"crypto/md5"
 	"encoding/json"
 	"fmt"
 	"github.com/go-redis/redis"
-	"io"
+	"github.com/skiy/comicFetch/library"
+	"github.com/skiy/comicFetch/model"
 	"io/ioutil"
-	"net/http"
 	"os"
 	"runtime"
 	"strconv"
@@ -154,6 +151,7 @@ func (t *Init) getComicList() {
 			mh.originPathUrl = value.OriginPathUrl
 			mh.fetchLocal = t.Conf.Setting.ImageFetch
 			mh.filePath = t.Conf.Image.Path
+			mh.Conf = t.Conf
 			mh.Init()
 		}
 	}
@@ -187,10 +185,7 @@ func (t *Init) fetchImage() {
 	//}
 
 	taskLoad = len(list)
-	fmt.Println(taskLoad)
 	cpuNum = runtime.NumCPU()
-
-	fmt.Println(taskLoad, cpuNum)
 
 	tasks := make(chan model.FtImages, taskLoad)
 
@@ -234,79 +229,18 @@ func (t *Init) worker(tasks chan model.FtImages, worker int) {
 			return
 		}
 
-		i := strings.LastIndex(task.ImageUrl, ".")
-		suffix := task.ImageUrl[i:]
-
-		//filename, _ := fmt.Printf("%s-%s-%s %s", task.Bid, task.Cid, task.OrderId, suffix)
 		filename := fmt.Sprintf("%s-%s-%s", task.Bid, task.Cid, task.OrderId)
-		filenameBype := []byte(filename)
-		md5Filename := md5.Sum(filenameBype)
-		filename = fmt.Sprintf("%x%s", md5Filename, suffix)
-		//fmt.Println(filename, suffix)
-		filepath := t.Conf.Image.Path + "/" + filename
 
-		exist, err := library.PathExists(filepath)
+		err, filename, size := library.FetchFile(task.ImageUrl, filename, t.Conf.Image.Path, task.OriginUrl)
 		if err != nil {
-			fmt.Println(err)
-			continue
-		}
-
-		if exist {
+			fmt.Println("fetch file", err)
+		} else {
 			image := t.Model.Table.Images
 			image.ImageUrl = filename
 			image.IsRemote = 0
-
+			image.Size = size
 			tid, _ := strconv.Atoi(task.Id)
 			t.Model.UpdateImage(tid, image)
-
-			continue
 		}
-
-		imageFile, err := os.Create(filepath)
-		if err != nil {
-			fmt.Printf("[writeImage create file]: fileName: %s\n href: %s\nerror: %s\n", filepath, task.ImageUrl, err.Error())
-			continue
-		}
-
-		client := &http.Client{}
-
-		//提交请求
-		reqest, err := http.NewRequest("GET", task.ImageUrl, nil)
-		if err != nil {
-			fmt.Println(err)
-			continue
-		}
-
-		//增加header选项
-		reqest.Header.Add("NT", "1")
-		reqest.Header.Add("If-Modified-Since", "Thu, 06 Sep 2018 03:54:19 GMT")
-		reqest.Header.Add("If-None-Match", "BDE9E8B0317BF99A37BE8FE52763AF1E")
-		reqest.Header.Add("Referer", task.OriginUrl)
-
-		//处理返回结果
-		res, _ := client.Do(reqest)
-
-		//fmt.Println(res.StatusCode)
-		if res.StatusCode != 200 {
-			fmt.Sprintf("status code error: %d %s", res.StatusCode, res.Status)
-			os.Remove(filepath)
-			continue
-		}
-
-		size, err := io.Copy(imageFile, res.Body)
-		if err != nil {
-			fmt.Printf("io.Copy: error: %s  href: %s\n", err.Error(), task.ImageUrl)
-			os.Remove(filepath)
-		}
-		fmt.Printf("Get From %s: %d bytes\n", task.ImageUrl, size)
-
-		//fmt.Println(task, suffix)
-		image := t.Model.Table.Images
-		image.ImageUrl = filename
-		image.IsRemote = 0
-		image.Size = size
-
-		tid, _ := strconv.Atoi(task.Id)
-		t.Model.UpdateImage(tid, image)
 	}
 }

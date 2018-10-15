@@ -72,7 +72,7 @@ func (t *Config) ReadConfig() {
 	}
 
 	s2 := new(sqlite)
-	err = cfg.Section("Mysql").MapTo(s2)
+	err = cfg.Section("Sqlite").MapTo(s2)
 	if err == nil {
 		t.Sqlite = s2
 	}

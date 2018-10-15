@@ -1,11 +1,12 @@
 package controller
 
 import (
-	"github.com/skiy/comicFetch/library"
-	"github.com/skiy/comicFetch/model"
+	"crypto/md5"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/jinzhu/gorm"
+	"github.com/skiy/comicFetch/library"
+	"github.com/skiy/comicFetch/model"
 	"log"
 	"net/http"
 	"regexp"
@@ -27,6 +28,7 @@ type mh160 struct {
 	originWeb,
 	originFlag string
 	fetchLocal bool
+	Conf       library.Config
 }
 
 func (t *mh160) Init() {
@@ -95,7 +97,14 @@ func (t *mh160) mobileChapter() {
 		if t.fetchLocal && book.OriginImageUrl != "" && book.ImageUrl == "" {
 			b1 := t.model.Table.Books
 
-			err, imageUrl, _ := library.FetchFile(book.OriginImageUrl, t.filePath, book.OriginUrl)
+			filename := strconv.Itoa(book.Id)
+			if t.Conf.Image.Nametype == "md5" {
+				filenameBype := []byte(filename)
+				md5Filename := md5.Sum(filenameBype)
+				filename = fmt.Sprintf("%x", md5Filename)
+			}
+
+			err, imageUrl, _ := library.FetchFile(book.OriginImageUrl, filename, t.filePath, book.OriginUrl)
 
 			//fmt.Println(nowTime)
 			if err == nil {
