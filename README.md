@@ -2,7 +2,8 @@
 
 本程序作为本人学习Go语言的练手之作。   
 程序支持采集站点：漫画160   
-支持 MySQL 和 SQLite 数据库 
+支持 MySQL 和 SQLite 数据库    
+支持MacOS、Linux、Windows
 
 ------
 ## 采集说明
@@ -16,10 +17,12 @@
 
 ### 使用说明
 - **新增漫画:**   
-向 redis db1 添加数据（格式）   
-> ```set newbooks '[{"id":25510,"flag":"mh160"},{"id":11106,"flag":"mh160"},{"id":11105,"flag":"mh160"}]'```   
-或向 newbooks.json 文件添加数据 (格式)    
-> ```[{"id":31512,"flag":"mh160"},{"id":11106,"flag":"mh160"},{"id":11105,"flag":"mh160"}]```
+
+> 向 redis db1 添加数据（格式）   
+>> ```set newbooks '[{"id":25510,"flag":"mh160"},{"id":11106,"flag":"mh160"},{"id":11105,"flag":"mh160"}]'```   
+
+>或向 newbooks.json 文件添加数据 (格式)    
+>> ```[{"id":31512,"flag":"mh160"},{"id":11106,"flag":"mh160"},{"id":11105,"flag":"mh160"}]```
 
 - **程序使用:**   
 使用 mysql 方式需要导入 comic.sql 到 MySQL 数据库   
