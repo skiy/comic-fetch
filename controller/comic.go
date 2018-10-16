@@ -235,12 +235,9 @@ func (t *Init) worker(tasks chan model.FtImages, worker int) {
 		if err != nil {
 			fmt.Println("fetch file", err)
 		} else {
-			image := t.Model.Table.Images
-			image.ImageUrl = filename
-			image.IsRemote = 0
-			image.Size = size
+			image := map[string]interface{}{"image_url": filename, "is_remote": 0, "size": size}
 			tid, _ := strconv.Atoi(task.Id)
-			t.Model.UpdateImage(tid, image)
+			t.Model.UpdateImageField(tid, image)
 		}
 	}
 }
