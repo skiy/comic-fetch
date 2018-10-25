@@ -93,7 +93,10 @@ func FetchFile(url, filename, imagePath, referer string) (err error, fullpath st
 		return
 	}
 
-	client := &http.Client{}
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := &http.Client{Transport: tr}
 
 	//提交请求
 	reqest, err := http.NewRequest("GET", url, nil)
@@ -134,7 +137,10 @@ func FetchFile(url, filename, imagePath, referer string) (err error, fullpath st
 远程图片
 */
 func OriginFile(url, referer string) (resBody io.ReadCloser, err error) {
-	client := &http.Client{}
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := &http.Client{Transport: tr}
 
 	//提交请求
 	reqest, err := http.NewRequest("GET", url, nil)
