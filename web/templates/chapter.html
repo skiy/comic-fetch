@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{{.title}}</title>
+</head>
+<body>
+{{if gt (len .chapterList) 0}}
+{{range .chapterList}}
+<a href='/picture/{{.Bid}}/{{.Id}}' target='_blank'>{{.Title}}</a><br />
+{{end}}
+{{else}}
+<<{{.info.Name}}>> 漫画不存在章节
+{{end}}
+</body>
+</html>

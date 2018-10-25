@@ -34,17 +34,19 @@ func main() {
 
 	Comic := new(controller.Init)
 
-	cache := redis.NewClient(&redis.Options{
-		Addr:     Conf.Redis.Host + ":" + Conf.Redis.Port,
-		Password: Conf.Redis.Password, // no password set
-		DB:       Conf.Redis.Db,       // use default DB
-	})
+	if s.Cache {
+		cache := redis.NewClient(&redis.Options{
+			Addr:     Conf.Redis.Host + ":" + Conf.Redis.Port,
+			Password: Conf.Redis.Password, // no password set
+			DB:       Conf.Redis.Db,       // use default DB
+		})
 
-	pong, err := cache.Ping().Result()
-	if err != nil {
-		fmt.Println(pong, err)
-	} else {
-		Comic.Cache = cache
+		pong, err := cache.Ping().Result()
+		if err != nil {
+			fmt.Println(pong, err)
+		} else {
+			Comic.Cache = cache
+		}
 	}
 
 	Comic.Model.Db = dbh

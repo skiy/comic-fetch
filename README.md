@@ -32,12 +32,14 @@
 ### TODO
 - 数据库、缓存 可配置 √
 - 抓取图片资源至本地 √
-- GoWeb 方式展示(不再依赖PHP) (b
+- GoWeb 方式展示(不再依赖PHP) √
 - 支持 sqlite √
+- 不再使用暴破方式提取图片地址(提取JS渲染的网页) (c
 
-## 感谢以下支持扩展库
+## 感谢以下开源扩展
 - github.com/go-ini/ini   
 - github.com/jinzhu/gorm      
 - github.com/PuerkitoBio/goquery   
 - github.com/axgle/mahonia   
 - github.com/go-redis/redis   
+- github.com/gin-gonic/gin   

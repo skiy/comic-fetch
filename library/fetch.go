@@ -123,3 +123,37 @@ func FetchFile(url, filename, imagePath, referer string) (err error, fullpath st
 	fullpath = filename
 	return
 }
+
+/**
+远程图片
+*/
+func OriginFile(url, referer string) (resBody io.ReadCloser, err error) {
+	client := &http.Client{}
+
+	//提交请求
+	reqest, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	//增加header选项
+	reqest.Header.Add("NT", "1")
+	reqest.Header.Add("If-Modified-Since", "Thu, 06 Sep 2018 03:54:19 GMT")
+	reqest.Header.Add("If-None-Match", "BDE9E8B0317BF99A37BE8FE52763AF1E")
+	reqest.Header.Add("Referer", referer)
+
+	//处理返回结果
+	res, err := client.Do(reqest)
+
+	//fmt.Println(res.StatusCode)
+	if res.StatusCode != 200 {
+		fmt.Sprintf("status code error: %d %s", res.StatusCode, res.Status)
+		return
+	}
+
+	if err == nil {
+		resBody = res.Body
+	}
+	return
+}

@@ -1,12 +1,12 @@
 package model
 
 type Table struct {
-	Books   tb_books
-	Chapter tb_chapter
-	Images  tb_images
+	Books   TbBooks
+	Chapter TbChapter
+	Images  TbImages
 }
 
-type tb_books struct {
+type TbBooks struct {
 	Id int
 	Name,
 	ImageUrl string //漫画图标地址
@@ -21,7 +21,7 @@ type tb_books struct {
 	CreatedAt int64 //创建时间
 }
 
-type tb_chapter struct {
+type TbChapter struct {
 	Id,
 	Bid,
 	ChapterId int
@@ -32,7 +32,7 @@ type tb_chapter struct {
 	CreatedAt int64
 }
 
-type tb_images struct {
+type TbImages struct {
 	Id,
 	Bid,
 	Cid,

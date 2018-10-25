@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>{{.title}}</title>
+</head>
+<body>
+{{if gt (len .list) 0}}
+    {{range .list}}
+        {{if gt (len .ImageUrl) 0}}
+        <img src='{{.ImageUrl}}' /><br />
+        {{end}}
+        <a href='/chapter/{{.Id}}/0' target='_blank'>{{.Name}}</a><br />
+    {{end}}
+{{else}}
+未抓取到漫画
+{{end}}
+</body>
+</html>

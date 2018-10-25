@@ -7,6 +7,7 @@ import (
 	"github.com/skiy/comicFetch/library"
 	"github.com/skiy/comicFetch/model"
 	"io/ioutil"
+	"log"
 	"os"
 	"runtime"
 	"strconv"
@@ -140,7 +141,7 @@ func (t *Init) getComicList() {
 			continue
 		}
 
-		fmt.Printf(comicTip, value.Name, value.Id, "正在更新……")
+		log.Printf(comicTip, value.Name, value.Id, "正在更新……")
 
 		if strings.EqualFold(value.OriginFlag, "mh160") {
 			var mh mh160
