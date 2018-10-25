@@ -1,6 +1,7 @@
 package library
 
 import (
+	"crypto/tls"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/axgle/mahonia"
@@ -15,7 +16,12 @@ import (
 获取源码
 */
 func FetchSource(url string) (doc *goquery.Document) {
-	res, err := http.Get(url)
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := &http.Client{Transport: tr}
+
+	res, err := client.Get(url)
 
 	if err != nil {
 		log.Fatal(err)
