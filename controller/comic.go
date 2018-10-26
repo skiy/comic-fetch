@@ -197,8 +197,6 @@ func (t *Init) fetchImage() {
 
 	tasks := make(chan model.FtImages, taskLoad)
 
-	fmt.Println(t.Conf.Image)
-
 	exist, err := library.PathExists(t.Conf.Image.Path)
 	if err != nil {
 		fmt.Println(err)
