@@ -3,13 +3,14 @@ package library
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/PuerkitoBio/goquery"
-	"github.com/axgle/mahonia"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/PuerkitoBio/goquery"
+	"github.com/axgle/mahonia"
 )
 
 /**

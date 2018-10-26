@@ -3,9 +3,6 @@ package controller
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/go-redis/redis"
-	"github.com/skiy/comicFetch/library"
-	"github.com/skiy/comicFetch/model"
 	"io/ioutil"
 	"log"
 	"os"
@@ -13,6 +10,10 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+
+	"github.com/go-redis/redis"
+	"github.com/skiy/comicFetch/library"
+	"github.com/skiy/comicFetch/model"
 )
 
 type Init struct {
@@ -238,18 +239,13 @@ func (t *Init) worker(tasks chan model.FtImages, worker int) {
 
 		filename := fmt.Sprintf("%s-%s-%s", task.Bid, task.Cid, task.OrderId)
 
-		var imagePath string
-		if strings.HasPrefix(t.Conf.Image.Path, "/") {
-			imagePath = t.Conf.Image.Path
-		} else {
-			imagePath := t.Conf.Image.Path
-			if !strings.HasPrefix(imagePath, "/") {
-				fullrealpath, err := library.GetCurrentDirectory()
-				if err != nil {
-					fmt.Println(err, "GetCurrentDirectory error")
-				} else {
-					imagePath = fullrealpath + "/" + imagePath
-				}
+		imagePath := t.Conf.Image.Path
+		if !strings.HasPrefix(imagePath, "/") {
+			fullrealpath, err := library.GetCurrentDirectory()
+			if err != nil {
+				fmt.Println(err, "GetCurrentDirectory error")
+			} else {
+				imagePath = fullrealpath + "/" + imagePath
 			}
 		}
 		err, filename, size := library.FetchFile(task.ImageUrl, filename, imagePath, task.OriginUrl)

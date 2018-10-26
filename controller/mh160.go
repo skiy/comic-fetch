@@ -4,16 +4,17 @@ import (
 	"crypto/md5"
 	"crypto/tls"
 	"fmt"
-	"github.com/PuerkitoBio/goquery"
-	"github.com/jinzhu/gorm"
-	"github.com/skiy/comicFetch/library"
-	"github.com/skiy/comicFetch/model"
 	"log"
 	"net/http"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/PuerkitoBio/goquery"
+	"github.com/jinzhu/gorm"
+	"github.com/skiy/comicFetch/library"
+	"github.com/skiy/comicFetch/model"
 )
 
 type mh160 struct {
