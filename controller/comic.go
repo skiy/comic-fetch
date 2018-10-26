@@ -59,7 +59,15 @@ func (t *Init) newBooks() {
 		str = []byte(v)
 		cacheType = "cache"
 	} else {
+
 		//file 方式
+		filerealpath, err := library.GetCurrentDirectory()
+		if err != nil {
+			fmt.Println(err, "GetCurrentDirectory error")
+		} else {
+			filepath = filerealpath + filepath
+		}
+
 		if _, err := os.Stat(filepath); os.IsNotExist(err) {
 			fmt.Println("Load cache filepath fail", err)
 			return
