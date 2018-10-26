@@ -113,15 +113,13 @@ func (t *mh160) mobileChapter() {
 				filename = fmt.Sprintf("%x", md5Filename)
 			}
 
-			var imagePath string
-			if strings.HasPrefix(t.Conf.Image.Path, "/") {
-				imagePath = t.Conf.Image.Path
-			} else {
-				var err error
-				imagePath, err = library.GetCurrentDirectory()
+			imagePath := t.Conf.Image.Path
+			if !strings.HasPrefix(imagePath, "/") {
+				fullrealpath, err := library.GetCurrentDirectory()
 				if err != nil {
 					fmt.Println(err, "GetCurrentDirectory error")
-					imagePath = t.Conf.Image.Path
+				} else {
+					imagePath = fullrealpath + "/" + imagePath
 				}
 			}
 

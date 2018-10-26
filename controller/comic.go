@@ -65,7 +65,7 @@ func (t *Init) newBooks() {
 		if err != nil {
 			fmt.Println(err, "GetCurrentDirectory error")
 		} else {
-			filepath = filerealpath + filepath
+			filepath = filerealpath + "/" + filepath
 		}
 
 		if _, err := os.Stat(filepath); os.IsNotExist(err) {
@@ -242,11 +242,14 @@ func (t *Init) worker(tasks chan model.FtImages, worker int) {
 		if strings.HasPrefix(t.Conf.Image.Path, "/") {
 			imagePath = t.Conf.Image.Path
 		} else {
-			var err error
-			imagePath, err = library.GetCurrentDirectory()
-			if err != nil {
-				fmt.Println(err, "GetCurrentDirectory error")
-				imagePath = t.Conf.Image.Path
+			imagePath := t.Conf.Image.Path
+			if !strings.HasPrefix(imagePath, "/") {
+				fullrealpath, err := library.GetCurrentDirectory()
+				if err != nil {
+					fmt.Println(err, "GetCurrentDirectory error")
+				} else {
+					imagePath = fullrealpath + "/" + imagePath
+				}
 			}
 		}
 		err, filename, size := library.FetchFile(task.ImageUrl, filename, imagePath, task.OriginUrl)
