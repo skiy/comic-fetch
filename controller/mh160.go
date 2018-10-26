@@ -23,13 +23,11 @@ type mh160 struct {
 	model model.Comic
 	db    *gorm.DB
 	imageUrl,
-	filePath, //文件保存路径
 	originImageUrl,
 	originPathUrl,
 	originWeb,
 	originFlag string
-	fetchLocal bool
-	Conf       library.Config
+	Conf library.Config
 }
 
 func (t *mh160) Init() {
@@ -85,17 +83,27 @@ func (t *mh160) mobileChapter() {
 
 		book = t.model.CreateBook(books)
 
+		//增加新漫画
 		if book.Id > 0 {
+			//新增漫画
 			t.new = true
 
-			var msg library.Message
-			msg.IsOpen = true
+			//打开通知,打开新漫画通知
+			if t.Conf.Notice.Open != 0 && t.Conf.Notice.NewBook {
+				var msg library.Message
+				msg.Conf = t.Conf
 
-			//钉钉通知
-			msg.Dingtalk(1, bookName, t.originWeb)
+				switch t.Conf.Notice.Open {
+				//钉钉通知
+				case 1:
+					msg.Dingtalk(1, bookName, t.originWeb)
+					break
+
+				}
+			}
 		}
 	} else {
-		if t.fetchLocal && book.OriginImageUrl != "" && book.ImageUrl == "" {
+		if t.Conf.Setting.ImageFetch && book.OriginImageUrl != "" && book.ImageUrl == "" {
 			b1 := t.model.Table.Books
 
 			filename := strconv.Itoa(book.Id)
@@ -105,9 +113,20 @@ func (t *mh160) mobileChapter() {
 				filename = fmt.Sprintf("%x", md5Filename)
 			}
 
-			err, imageUrl, _ := library.FetchFile(book.OriginImageUrl, filename, t.filePath, book.OriginUrl)
+			var imagePath string
+			if strings.HasPrefix(t.Conf.Image.Path, "/") {
+				imagePath = t.Conf.Image.Path
+			} else {
+				var err error
+				imagePath, err = library.GetCurrentDirectory()
+				if err != nil {
+					fmt.Println(err, "GetCurrentDirectory error")
+					imagePath = t.Conf.Image.Path
+				}
+			}
 
-			//fmt.Println(nowTime)
+			err, imageUrl, _ := library.FetchFile(book.OriginImageUrl, filename, imagePath, book.OriginUrl)
+
 			if err == nil {
 				b1.ImageUrl = imageUrl
 				b1.UpdatedAt = nowTime
@@ -209,12 +228,18 @@ func (t *mh160) mobileChapter() {
 				//图片
 				isAdd := t.detail(test[2], book.Id, chapterInfo.Id, chapterNum, bookName, chapterName, counts)
 
-				//isAdd = true
-				//非新增漫画的章节更新
-				if isAdd && !t.new {
+				//添加章节,非首次新增漫画(若首次添加漫画通知可能过多,所以首次添加漫画不通知),打开通知,打开新增章节通知
+				if isAdd && !t.new && t.Conf.Notice.Open != 0 && t.Conf.Notice.NewChapter {
 					var msg library.Message
-					msg.IsOpen = true
-					msg.Dingtalk(2, bookName, chapterName)
+					msg.Conf = t.Conf
+
+					switch t.Conf.Notice.Open {
+					//钉钉通知
+					case 1:
+						msg.Dingtalk(2, bookName, chapterName)
+						break
+
+					}
 				}
 			}
 		}

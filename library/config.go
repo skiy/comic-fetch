@@ -11,6 +11,7 @@ type Config struct {
 	Sqlite  *sqlite
 	Redis   *redis
 	Image   *image
+	Notice  *notice
 }
 
 type setting struct {
@@ -42,6 +43,14 @@ type redis struct {
 type image struct {
 	Path,
 	Nametype string
+}
+
+type notice struct {
+	Open int //0不使用, 1钉钉通知
+	NewBook,
+	NewChapter bool
+	Receiver,
+	DindTalkToken string
 }
 
 func (t *Config) ReadConfig() {
@@ -89,5 +98,11 @@ func (t *Config) ReadConfig() {
 	err = cfg.Section("Image").MapTo(i)
 	if err == nil {
 		t.Image = i
+	}
+
+	n := new(notice)
+	err = cfg.Section("Notice").MapTo(n)
+	if err == nil {
+		t.Notice = n
 	}
 }

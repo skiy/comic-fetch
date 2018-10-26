@@ -7,7 +7,7 @@ import (
 )
 
 type Message struct {
-	IsOpen bool
+	Conf Config
 }
 
 /**
@@ -15,15 +15,16 @@ type Message struct {
 flag 1新增漫画, 2更新漫画
 */
 func (t *Message) Dingtalk(flag int, params ...string) (notice bool) {
-	if !t.IsOpen {
-		return false
-	}
-
-	tk := "https://oapi.dingtalk.com/robot/send?access_token=8eaeec8ea1c97b646e85c89e884ff1cae5e5302991088f4a8d876268ce1bd59d"
+	tk := "https://oapi.dingtalk.com/robot/send?access_token=" + t.Conf.Notice.DindTalkToken
 
 	var content, mobile, all string
-	mobile = "18565756628"
+
+	mobile = t.Conf.Notice.Receiver
 	all = "false"
+
+	if t.Conf.Notice.Receiver == "" {
+		all = "true"
+	}
 
 	post := `
 {
