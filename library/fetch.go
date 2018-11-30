@@ -11,14 +11,20 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/axgle/mahonia"
+	"net"
+	"time"
 )
 
 /**
 获取源码
 */
 func FetchSource(url string) (doc *goquery.Document) {
+	var timeout time.Duration = 30
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		DialContext: (&net.Dialer{
+			Timeout: timeout * time.Second,
+		}).DialContext,
 	}
 	client := &http.Client{Transport: tr}
 
@@ -94,26 +100,31 @@ func FetchFile(url, filename, imagePath, referer string) (err error, fullpath st
 		return
 	}
 
+	var timeout time.Duration = 30
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		DialContext: (&net.Dialer{
+			Timeout: timeout * time.Second,
+		}).DialContext,
 	}
+
 	client := &http.Client{Transport: tr}
 
 	//提交请求
-	reqest, err := http.NewRequest("GET", url, nil)
+	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
 	//增加header选项
-	reqest.Header.Add("NT", "1")
-	reqest.Header.Add("If-Modified-Since", "Thu, 06 Sep 2018 03:54:19 GMT")
-	reqest.Header.Add("If-None-Match", "BDE9E8B0317BF99A37BE8FE52763AF1E")
-	reqest.Header.Add("Referer", referer)
+	request.Header.Add("NT", "1")
+	request.Header.Add("If-Modified-Since", "Thu, 06 Sep 2018 03:54:19 GMT")
+	request.Header.Add("If-None-Match", "BDE9E8B0317BF99A37BE8FE52763AF1E")
+	request.Header.Add("Referer", referer)
 
 	//处理返回结果
-	res, _ := client.Do(reqest)
+	res, _ := client.Do(request)
 
 	//fmt.Println(res.StatusCode)
 	if res.StatusCode != 200 {
@@ -138,9 +149,14 @@ func FetchFile(url, filename, imagePath, referer string) (err error, fullpath st
 远程图片
 */
 func OriginFile(url, referer string) (resBody io.ReadCloser, err error) {
+	var timeout time.Duration = 30
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		DialContext: (&net.Dialer{
+			Timeout: timeout * time.Second,
+		}).DialContext,
 	}
+
 	client := &http.Client{Transport: tr}
 
 	//提交请求
