@@ -417,7 +417,7 @@ func (t *mh160) checkUrl(url, chapterUrl string) bool {
 	//str := "https://mhpic6.lineinfo.cn/mh160tuku/d/斗罗大陆2绝世唐门_11140/第82话极动中的炽烈—天帝之锤_488477/0001.jpg"
 	//fmt.Println(url, "\n", str)
 
-	var timeout time.Duration = 30
+	var timeout time.Duration = 5
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		DialContext: (&net.Dialer{
