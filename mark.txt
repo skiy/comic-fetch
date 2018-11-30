@@ -1,3 +1,0 @@
-# 清除不存在漫画的章节
-SELECT * FROM tb_chapters c LEFT JOIN tb_images i ON i.cid = c.id WHERE i.id IS NULL
-DELETE c,i FROM tb_chapters c LEFT JOIN tb_images i ON i.cid = c.id WHERE i.id IS NULL
