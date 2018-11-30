@@ -61,7 +61,7 @@ func (t *Comic) FetchImageList() (images []FtImages) {
 */
 func (t *Comic) GetChapterList(bid int) (chapters []TbChapter) {
 	if bid != 0 {
-		t.Db.Where("bid = ?", bid).Find(&chapters)
+		t.Db.Where("bid = ?", bid).Order("order_id ASC").Find(&chapters)
 		return
 	}
 	t.Db.Find(&chapters)
