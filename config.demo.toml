@@ -1,0 +1,21 @@
+[setting]
+
+# 日志配置
+[log]
+    # 日志等级 all.全部日志, prod.一般日志(warning,error), alert.提示日志(warning,error,info), warning.警告日志, info.正常日志, error.错误日志
+    level = "alert"
+    # 日志保存目录,会在此目录下生成一个当天的日志文件
+    path = "logs"
+    # 是否输出错误位置,转换出错时建议打开, 以便配合作者修复 BUG
+    trace = false
+
+# 数据库连接
+[database]
+    [[database.default]]
+        host = "127.0.0.1"
+        port = "3306"
+        user = "root"
+        pass = "123456"
+        name = "comic"
+        type = "mysql"
+        debug = "true"
