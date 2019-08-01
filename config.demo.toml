@@ -1,6 +1,6 @@
 [setting]
 
-# 日志配置
+# 日志
 [log]
     # 日志等级 all.全部日志, prod.一般日志(warning,error), alert.提示日志(warning,error,info), warning.警告日志, info.正常日志, error.错误日志
     level = "alert"
@@ -9,7 +9,7 @@
     # 是否输出错误位置,转换出错时建议打开, 以便配合作者修复 BUG
     trace = false
 
-# 数据库连接
+# 数据库
 [database]
     [[database.default]]
         host = "127.0.0.1"
@@ -19,3 +19,6 @@
         name = "comic"
         type = "mysql"
         debug = "true"
+
+# 通知
+[notice]
