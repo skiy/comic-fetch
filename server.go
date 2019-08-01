@@ -3,15 +3,17 @@ package main
 import (
 	"fmt"
 	"github.com/gogf/gf/g/os/gcfg"
-	"github.com/skiy/comicFetch/app"
-	"github.com/skiy/comicFetch/system/scfg"
-	"github.com/skiy/comicFetch/system/sdb"
-	"github.com/skiy/comicFetch/system/slog"
+	"github.com/gogf/gf/g/os/glog"
+	"github.com/skiy/comic-fetch/app"
+	"github.com/skiy/gf-utils/ucfg"
+	"github.com/skiy/gf-utils/udb"
+	"github.com/skiy/gf-utils/ulog"
 	"runtime"
 )
 
 var (
 	cfg *gcfg.Config
+	log *glog.Logger
 )
 
 func main() {
@@ -23,18 +25,18 @@ func main() {
 
 	// 判断 MYSQL 连接是否正常
 	if err := checkConnectDB(); err != nil {
-		slog.Log.Fatalf("数据库连接失败: %s", err.Error())
+		ulog.Log.Fatalf("数据库连接失败: %s", err.Error())
 	}
 
 	// 启动
 	if err := app.NewApp().Start(); err != nil {
-		slog.Log.Fatalf("程序启动失败: %s", err.Error())
+		ulog.Log.Fatalf("程序启动失败: %s", err.Error())
 	}
 }
 
 // checkConnectDB 检测数据库连接是否正常
 func checkConnectDB() (err error) {
-	if err = sdb.GetDatabase().PingMaster(); err != nil {
+	if err = udb.GetDatabase().PingMaster(); err != nil {
 		return fmt.Errorf("%s(Database)", err.Error())
 	}
 	return err
@@ -43,5 +45,11 @@ func checkConnectDB() (err error) {
 // initialize 初始化服务
 func initialize() {
 	//配置文件
-	cfg = scfg.InitCfg()
+	cfg = ucfg.InitCfg()
+
+	//日志初始化
+	ulog.InitLog()
+
+	//日志配置
+	log = ulog.ReadLog()
 }
