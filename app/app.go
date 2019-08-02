@@ -2,7 +2,10 @@ package app
 
 import (
 	"errors"
+	"github.com/skiy/comic-fetch/app/config"
 	"github.com/skiy/comic-fetch/app/controller"
+	"github.com/skiy/comic-fetch/app/model"
+	"github.com/skiy/gf-utils/udb"
 )
 
 // App App
@@ -16,24 +19,35 @@ func NewApp() *App {
 
 // Start App start
 func (t *App) Start() (err error) {
+	books := ([]model.TbBooks)(nil)
 
-	var ctrl controller.Controller
+	db := udb.GetDatabase()
 
-	if ctrl, err = t.ctrl("mh160"); err != nil {
+	if err := db.Table(config.TbNameBooks).Structs(&books); err != nil {
 		return err
 	}
 
-	ctrl.ToFetch()
+	var ctrl controller.Controller
+
+	// 遍历表
+	for _, book := range books {
+		ctrl, err = t.ctrl(book.OriginFlag, &book)
+		if err != nil {
+			return err
+		}
+
+		ctrl.ToFetch()
+	}
 
 	return nil
 }
 
 // ctrl 返回控制器
-func (t *App) ctrl(name string) (ctrl controller.Controller, err error) {
+func (t *App) ctrl(name string, books *model.TbBooks) (ctrl controller.Controller, err error) {
 	switch name {
 
 	case "manhuaniu":
-		ctrl = controller.NewManhuaniu()
+		ctrl = controller.NewManhuaniu(books)
 
 	default:
 		err = errors.New("can not fetch this comic website. ")

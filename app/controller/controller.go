@@ -2,5 +2,6 @@ package controller
 
 // Controller interface
 type Controller interface {
-	ToFetch()
+	// 获取章节 URL 列表
+	ToFetchChapter() (err error)
 }

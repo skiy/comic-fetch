@@ -22,3 +22,13 @@
 
 # 通知
 [notice]
+    # 0不使用, 1钉钉通知
+    type = 0
+    # 新书通知
+    book = true
+    # 新章节通知
+    chapter = true
+    # 接收人,如果是钉钉则用手机号, 若是全部则留空
+    receiver = ""
+    # ding_talk_token
+    ding_talk_token = "8eaeec8ea1c97b646e85c89e884ff1cae5e5302991088f4a8d876268ce1bd59d"
