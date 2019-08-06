@@ -31,6 +31,11 @@ func (t *App) Start() (err error) {
 
 	// 遍历表
 	for _, book := range books {
+		// 更新的状态, 非正在更新
+		if book.Status != 0 {
+			continue
+		}
+
 		ctrl, err = t.ctrl(book.OriginFlag, &book)
 		if err != nil {
 			return err

@@ -11,7 +11,9 @@ import (
 	"github.com/skiy/gf-utils/udb"
 	"github.com/skiy/gf-utils/ulog"
 	"regexp"
+	"strconv"
 	"strings"
+	"time"
 )
 
 // Manhuaniu 漫画牛
@@ -31,6 +33,9 @@ func NewManhuaniu(books *model.TbBooks) *Manhuaniu {
 
 // ToFetch 采集
 func (t *Manhuaniu) ToFetch() (err error) {
+	log := ulog.ReadLog()
+	log.Printf("\n正在采集漫画: %s\n源站: %s\n源站漫画URL: %s\n", t.Books.Name, t.Books.OriginWeb, t.Books.OriginURL)
+
 	web := webURL[t.Books.OriginFlag]
 	if len(web) < t.Books.OriginWebType {
 		return errors.New("runtime error: index out of range for origin_web_type")
@@ -48,7 +53,6 @@ func (t *Manhuaniu) ToFetch() (err error) {
 		return errors.New("获取不到章节数据")
 	}
 
-	log := ulog.ReadLog()
 	log.Println(chapterURLList)
 
 	db := udb.GetDatabase()
@@ -61,12 +65,50 @@ func (t *Manhuaniu) ToFetch() (err error) {
 		}
 		err = nil
 	}
-	log.Println(chapters)
+
+	// 章节转Map
+	chapterStatusMap := map[int]model.TbChapters{}
+	for _, chapter := range chapters {
+		//log.Println(chapter)
+		chapterStatusMap[chapter.OriginID] = chapter
+	}
+
+	orderID := len(chapters)
+	//log.Println(chapters, "orderID: ", orderID)
+	log.Println("orderID: ", orderID)
 
 	// 这里应该用 channel 并发获取章节数据
 	for _, chapterURL := range chapterURLList {
+		preg := `\/([0-9]*).html`
+		re, err := regexp.Compile(preg)
+		if err != nil {
+			log.Warningf("章节ID正则执行失败: %v, URL: %s", err, chapterURL)
+			continue
+		}
+		chapterIDs := re.FindStringSubmatch(chapterURL)
+		if len(chapterIDs) != 2 {
+			log.Warningf("章节ID提取失败: %v, URL: %s", err, chapterURL)
+			continue
+		}
+		chapterIDStr := chapterIDs[1]
+		chapterID, err := strconv.Atoi(chapterIDStr)
+		if err != nil {
+			log.Fatalf("章节ID(%s)转Int型失败: %v", chapterIDStr, err)
+			continue
+		}
+
+		// 章节是否存在
+		chapterInfo, ok := chapterStatusMap[chapterID]
+		// 章节已存在
+		if ok {
+			// 章节采集已成功 或 章节停止采集
+			if chapterInfo.Status == 0 || chapterInfo.Status == 2 {
+				continue
+			}
+		}
+
 		fullChapterURL := t.WebURL + chapterURL
-		log.Println(fullChapterURL)
+		log.Println(fullChapterURL, chapterID)
 
 		chapterName, imageURLList, err := t.ToFetchChapter(fullChapterURL)
 		if err != nil {
@@ -79,10 +121,50 @@ func (t *Manhuaniu) ToFetch() (err error) {
 			continue
 		}
 
-		log.Println(chapterName, len(imageURLList))
+		var episodeID int
+		preg2 := `第([0-9]*)[话章]`
+		re2 := regexp.MustCompile(preg2)
+		episodeIDs := re2.FindStringSubmatch(chapterName)
+
+		if len(episodeIDs) > 1 {
+			episodeID, _ = strconv.Atoi(strings.Trim(episodeIDs[1], ""))
+		}
+
+		log.Println(chapterName, len(imageURLList), episodeID)
+		// 保存章节
 
 		for _, imageURL := range imageURLList {
 			log.Println(t.ResURL + imageURL)
+		}
+
+		status := 0
+		timestamp := time.Now().Unix()
+
+		// 存在章节(原来采集失败的章节)则变更采集状态
+		if ok {
+			chapterInfo.Status = status
+			chapterInfo.UpdatedAt = timestamp
+
+			if _, err := db.Table(config.TbNameChapters).Data(chapterInfo).Where(g.Map{"id": chapterInfo.ID}).Update(); err != nil {
+				log.Warningf("章节: %s, URL: %s, 更新失败", chapterName, fullChapterURL)
+			}
+		} else { // 未存在章节, 则新增章节
+			chapter := model.TbChapters{}
+			chapter.BookID = t.Books.ID
+			chapter.EpisodeID = episodeID
+			chapter.Title = chapterName
+			chapter.OrderID = orderID
+			chapter.OriginID = chapterID
+			chapter.Status = status
+			chapter.OriginURL = fullChapterURL
+			chapter.CreatedAt = timestamp
+			chapter.UpdatedAt = timestamp
+
+			if _, err := db.Table(config.TbNameChapters).Data(chapter).Insert(); err != nil {
+				log.Warningf("章节: %s, URL: %s, 保存失败", chapterName, fullChapterURL)
+			} else {
+				orderID++
+			}
 		}
 		//break
 	}
@@ -120,7 +202,10 @@ func (t *Manhuaniu) ToFetchChapter(chapterURL string) (chapterName string, image
 	script2Text := doc.Find("script").Eq(2).Text()
 
 	pregImages := `images\\/[^"]*`
-	re, _ := regexp.Compile(pregImages)
+	re, err := regexp.Compile(pregImages)
+	if err != nil {
+		return "", nil, err
+	}
 	images := re.FindAllString(script2Text, -1)
 
 	if images == nil {
@@ -134,7 +219,10 @@ func (t *Manhuaniu) ToFetchChapter(chapterURL string) (chapterName string, image
 	script22Text := doc.Find("script").Eq(22).Text()
 
 	pregInfo := `SinMH\.initChapter\(([^;]*)\)`
-	re2, _ := regexp.Compile(pregInfo)
+	re2, err := regexp.Compile(pregInfo)
+	if err != nil {
+		return "", nil, err
+	}
 	infos := re2.FindStringSubmatch(script22Text)
 
 	if len(infos) == 2 {

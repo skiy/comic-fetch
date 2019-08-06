@@ -4,8 +4,8 @@ package model
 type TbImages struct {
 	ID        int    `gconv:"id"`         // ID
 	BookID    int    `gconv:"book_id"`    // 漫画 ID
-	Cid       int    `gconv:"cid"`        // 章节编号
 	ChapterID int    `gconv:"chapter_id"` // 章节 ID
+	EpisodeID int    `gconv:"episode_id"` // 话序 ID
 	ImageURL  string `gconv:"image_url"`  // 图片地址
 	OriginURL string `gconv:"origin_url"` // 漫画图片采集地址
 	Size      int64  `gconv:"size"`       // 文件大小
