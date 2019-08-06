@@ -36,7 +36,10 @@ func (t *App) Start() (err error) {
 			return err
 		}
 
-		ctrl.ToFetch()
+		err = ctrl.ToFetch()
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
