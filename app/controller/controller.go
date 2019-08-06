@@ -7,7 +7,10 @@ type Controller interface {
 	// 获取数据
 	ToFetch() (err error)
 	// 获取章节 URL 列表
-	ToFetchChapter() (chapterURLList g.SliceStr, err error)
+	ToFetchChapterList() (chapterURLList g.SliceStr, err error)
+
+	// 获取章节数据
+	ToFetchChapter(chapterURL string) (chapterName string, imageURLList g.SliceStr, err error)
 }
 
 const (
