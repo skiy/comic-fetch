@@ -11,6 +11,9 @@ type Controller interface {
 
 	// 获取章节数据
 	ToFetchChapter(chapterURL string) (chapterName string, imageURLList g.SliceStr, err error)
+
+	// 图片本地化
+	ToSaveImage(imageURL, imageFullName string) (size int, err error)
 }
 
 const (

@@ -38,3 +38,10 @@ func PageSource(sourceURL, pageChartset string) (doc *goquery.Document, err erro
 
 	return
 }
+
+// GetResponse GetResponse
+func GetResponse(url, referer string) (response *ghttp.ClientResponse, err error) {
+	c := ghttp.NewClient()
+	c.SetHeader("Referer", referer)
+	return c.Get(url)
+}

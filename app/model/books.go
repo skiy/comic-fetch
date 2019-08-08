@@ -2,7 +2,7 @@ package model
 
 // TbBooks 漫画表
 type TbBooks struct {
-	ID             int    `gconv:"id"`               // ID
+	ID             int64  `gconv:"id"`               // ID
 	Name           string `gconv:"name"`             // 漫画名
 	ImageURL       string `gconv:"image_url"`        // 漫画图标地址
 	Status         int    `gconv:"status"`           // 状态 (0正在更新,1暂停更新,2完结)

@@ -2,8 +2,8 @@ package model
 
 // TbChapters 章节表
 type TbChapters struct {
-	ID        int    `gconv:"id"`         // ID
-	BookID    int    `gconv:"book_id"`    // 漫画 ID
+	ID        int64  `gconv:"id"`         // ID
+	BookID    int64  `gconv:"book_id"`    // 漫画 ID
 	EpisodeID int    `gconv:"episode_id"` // 话序 ID
 	Title     string `gconv:"title"`      // 章节标题
 	OrderID   int    `gconv:"order_id"`   // 章节排序
