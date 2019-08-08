@@ -313,8 +313,3 @@ func (t *Manhuaniu) ToFetchChapter(chapterURL string) (chapterName string, image
 
 	return
 }
-
-// ToSaveImage 图片本地化
-func (t *Manhuaniu) ToSaveImage(imageURL, imageFullName string) (size int, err error) {
-	panic("implement me")
-}
