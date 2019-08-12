@@ -4,7 +4,6 @@ import "github.com/gogf/gf/g/net/ghttp"
 
 // HomeController HomeController
 type HomeController struct {
-
 }
 
 // NewHomeController HomeController init

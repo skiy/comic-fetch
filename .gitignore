@@ -116,6 +116,7 @@ fabric.properties
 
 .idea/
 
+dist/
 logs/
 upload/
 

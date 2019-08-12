@@ -2,6 +2,8 @@ package controller
 
 import (
 	"github.com/gogf/gf/g"
+	"github.com/skiy/gf-utils/ucfg"
+
 	// router
 	_ "github.com/skiy/comic-fetch/app/router"
 )
@@ -17,7 +19,15 @@ func NewWeb() *Web {
 
 // Start Web start
 func (t *Web) Start() (err error) {
-	err = g.Server().Start()
+	httpPort := 33001
+	if p := ucfg.InitCfg().GetInt("server.http.port"); p != 0 {
+		httpPort = p
+	}
+
+	s := g.Server()
+	s.SetPort(httpPort)
+
+	err = s.Start()
 	if err != nil {
 		return
 	}

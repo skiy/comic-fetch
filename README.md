@@ -2,11 +2,18 @@
 
 ### 开发进度
 1. 基础框架
+- cli
+>> cli
+- web
+>> 主页
+>>> 静态资源、
+- api
+>> api
 2. 采集
 3. 可视化
 
 ### 感谢
-- github.com/gogf/gf
+- [https://github.com/gogf/gf]()
 
 ### 作者
 Author: Skiychan   
