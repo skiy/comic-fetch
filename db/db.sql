@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.8.3
+-- version 4.9.0.1
 -- https://www.phpmyadmin.net/
 --
--- 主机： 127.0.0.1
--- 生成日期： 2019-08-06 21:27:18
--- 服务器版本： 5.7.22
--- PHP 版本： 7.3.7
+-- 主机： localhost
+-- 生成日期： 2019-08-12 17:35:55
+-- 服务器版本： 5.7.26-log
+-- PHP 版本： 7.3.6
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;

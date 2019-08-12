@@ -8,11 +8,14 @@ import (
 func init() {
 	s := g.Server()
 
-	homeController := web.NewHomeController()
-	s.BindHandler("/", homeController.Index)
-
-	s.SetIndexFolder(true)
+	// Static setting
+	//s.SetIndexFolder(true)
 	//s.SetServerRoot(".")
-	//s.AddSearchPath("dist")
-	s.AddStaticPath("/static", "dist")
+	s.AddSearchPath("home/dist")
+
+	//s.AddStaticPath("/", "home/index.html")
+	//s.AddStaticPath("/static", "home/static")
+
+	homeController := web.NewHomeController()
+	s.BindHandler("/abc", homeController.Index)
 }
