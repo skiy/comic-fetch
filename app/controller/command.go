@@ -1,24 +1,24 @@
-package app
+package controller
 
 import (
 	"errors"
 	"github.com/skiy/comic-fetch/app/config"
-	"github.com/skiy/comic-fetch/app/controller"
+	"github.com/skiy/comic-fetch/app/controller/command"
 	"github.com/skiy/comic-fetch/app/model"
 	"github.com/skiy/gf-utils/udb"
 )
 
-// App App
-type App struct{}
+// Command Command
+type Command struct{}
 
-// NewApp App init
-func NewApp() *App {
-	t := &App{}
+// NewCommand Command init
+func NewCommand() *Command {
+	t := &Command{}
 	return t
 }
 
-// Start App start
-func (t *App) Start() (err error) {
+// Start Command start
+func (t *Command) Start() (err error) {
 	books := ([]model.TbBooks)(nil)
 
 	db := udb.GetDatabase()
@@ -27,7 +27,7 @@ func (t *App) Start() (err error) {
 		return err
 	}
 
-	var ctrl controller.Controller
+	var ctrl command.Controller
 
 	// 遍历表
 	for _, book := range books {
@@ -51,11 +51,11 @@ func (t *App) Start() (err error) {
 }
 
 // ctrl 返回控制器
-func (t *App) ctrl(name string, books *model.TbBooks) (ctrl controller.Controller, err error) {
+func (t *Command) ctrl(name string, books *model.TbBooks) (ctrl command.Controller, err error) {
 	switch name {
 
 	case "manhuaniu":
-		ctrl = controller.NewManhuaniu(books)
+		ctrl = command.NewManhuaniu(books)
 
 	default:
 		err = errors.New("can not fetch this comic website. ")

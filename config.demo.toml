@@ -3,7 +3,7 @@
 # 日志
 [log]
     # 日志等级 all.全部日志, prod.一般日志(warning,error), alert.提示日志(warning,error,info), warning.警告日志, info.正常日志, error.错误日志
-    level = "alert"
+    level = "all"
     # 日志保存目录,会在此目录下生成一个当天的日志文件
     path = "logs"
     # 是否输出错误位置,转换出错时建议打开, 以便配合作者修复 BUG
@@ -19,6 +19,13 @@
         name = "comic"
         type = "mysql"
         debug = "true"
+
+# 服务器
+[server]
+    ## HTTP 服务器
+    [server.http]
+        host = "0.0.0.0"
+        port = "33001"
 
 # 通知
 [notice]
@@ -36,9 +43,9 @@
 # 图片配置
 [image]
     # 是否图片本地化
-    local = false
+    local = true
     # 图片保存路径
     path = "upload/images"
     # 图片名方式 md5 / normal
     # Bid-Cid-OrderId 或 md5(Bid-Cid-OrderId) 漫画ID-章节ID-排序ID
-    nametype = "normal"
+    nametype = "md5"

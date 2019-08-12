@@ -6,7 +6,7 @@ import (
 	"github.com/gogf/gf/g"
 	"github.com/gogf/gf/g/os/gcfg"
 	"github.com/gogf/gf/g/os/glog"
-	"github.com/skiy/comic-fetch/app"
+	"github.com/skiy/comic-fetch/app/controller"
 	"github.com/skiy/gf-utils/ucfg"
 	"github.com/skiy/gf-utils/udb"
 	"github.com/skiy/gf-utils/ulog"
@@ -26,8 +26,8 @@ var (
 	v bool
 	// 添加漫画
 	a bool
-	// 打开网站
-	w bool
+	// web or cli start
+	s string
 	// S 漫画网站标识 ( manhuaniu etc... )
 	S string
 	// I 漫画源 ID
@@ -40,7 +40,7 @@ func init() {
 	flag.BoolVar(&h, "h", false, "this help")
 	flag.BoolVar(&v, "v", false, "show version and exit")
 	flag.BoolVar(&a, "add", false, "add new comic")
-	flag.BoolVar(&w, "web", false, "comic web run")
+	flag.StringVar(&s, "s", "cli", "comic start (web or cli)")
 	flag.StringVar(&S, "S", "", "support sites: manhuaniu")
 	flag.Int64Var(&I, "I", 0, "comic origin id")
 	flag.Usage = usage
@@ -68,8 +68,9 @@ func main() {
 		flag.Usage()
 	} else if v { // 显示版本号
 		fmt.Printf("comic version: comic/%s\n", version)
-	} else if w {
+	} else if s == "web" {
 		fmt.Printf("comic web run\n")
+		start("web")
 	} else { // 默认采集
 		if S != "" { // 更新 或 添加 指定的漫画
 			supportSites := g.Map{
@@ -96,20 +97,27 @@ func main() {
 			}
 
 		} else {
-			run()
+			start("command")
 		}
 	}
 }
 
-// 更新所有漫画
-func run() {
+// start app / web start
+func start(flag string) {
 	// 判断 MYSQL 连接是否正常
 	if err := checkConnectDB(); err != nil {
 		ulog.Log.Fatalf("数据库连接失败: %s", err.Error())
 	}
 
+	var app controller.Controller
+	if flag == "command" {
+		app = controller.NewCommand()
+	} else {
+		app = controller.NewWeb()
+	}
+
 	// 启动
-	if err := app.NewApp().Start(); err != nil {
+	if err := app.Start(); err != nil {
 		ulog.Log.Fatalf("程序启动失败: %s", err.Error())
 	}
 }
