@@ -3,38 +3,35 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "ng-alain": {
+    "home": {
       "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "less"
+        }
+      },
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
-      "schematics": {
-        "@schematics/angular:component": {
-          "styleext": "less"
-        }
-      },
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist",
+            "outputPath": "dist/home",
             "index": "src/index.html",
             "main": "src/main.ts",
-            "tsConfig": "tsconfig.app.json",
             "polyfills": "src/polyfills.ts",
+            "tsConfig": "tsconfig.app.json",
+            "aot": false,
             "assets": [
-              "src/assets",
-              "src/favicon.ico"
+              "src/favicon.ico",
+              "src/assets"
             ],
             "styles": [
               "src/styles.less"
             ],
             "scripts": [
-              "node_modules/@antv/g2/build/g2.js",
-              "node_modules/@antv/data-set/dist/data-set.min.js",
-              "node_modules/@antv/g2-plugin-slider/dist/g2-plugin-slider.min.js",
-              "node_modules/ajv/dist/ajv.bundle.js",
-              "node_modules/qrious/dist/qrious.min.js"
+              "node_modules/ajv/dist/ajv.bundle.js"
             ]
           },
           "configurations": {
@@ -59,11 +56,6 @@
                   "type": "initial",
                   "maximumWarning": "2mb",
                   "maximumError": "5mb"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "6kb",
-                  "maximumError": "10kb"
                 }
               ]
             },
@@ -80,15 +72,15 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "ng-alain:build",
+            "browserTarget": "home:build",
             "proxyConfig": "proxy.conf.json"
           },
           "configurations": {
             "production": {
-              "browserTarget": "ng-alain:build:production"
+              "browserTarget": "home:build:production"
             },
             "hmr": {
-              "browserTarget": "ng-alain:build:hmr",
+              "browserTarget": "home:build:hmr",
               "hmr": true
             }
           }
@@ -96,7 +88,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "ng-alain:build"
+            "browserTarget": "home:build"
           }
         },
         "test": {
@@ -104,19 +96,17 @@
           "options": {
             "main": "src/test.ts",
             "polyfills": "src/polyfills.ts",
-            "karmaConfig": "karma.conf.js",
             "tsConfig": "tsconfig.spec.json",
-            "scripts": [
-              "node_modules/@antv/g2/dist/g2.min.js",
-              "node_modules/@antv/data-set/dist/data-set.min.js",
-              "node_modules/@antv/g2-plugin-slider/dist/g2-plugin-slider.min.js",
-              "node_modules/ajv/dist/ajv.bundle.js",
-              "node_modules/qrious/dist/qrious.min.js"
+            "karmaConfig": "karma.conf.js",
+            "assets": [
+              "src/favicon.ico",
+              "src/assets"
             ],
             "styles": [
+              "src/styles.less"
             ],
-            "assets": [
-              "src/assets"
+            "scripts": [
+              "node_modules/ajv/dist/ajv.bundle.js"
             ]
           }
         },
@@ -137,16 +127,52 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "ng-alain:serve"
+            "devServerTarget": "home:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "ng-alain:serve:production"
+              "devServerTarget": "home:serve:production"
             }
           }
         }
       }
     }
   },
-  "defaultProject": "ng-alain"
+  "defaultProject": "home",
+  "schematics": {
+    "ng-alain:module": {
+      "routing": true,
+      "spec": false
+    },
+    "ng-alain:list": {
+      "spec": false
+    },
+    "ng-alain:edit": {
+      "spec": false,
+      "modal": true
+    },
+    "ng-alain:view": {
+      "spec": false,
+      "modal": true
+    },
+    "ng-alain:curd": {
+      "spec": false
+    },
+    "@schematics/angular:module": {
+      "routing": true,
+      "spec": false
+    },
+    "@schematics/angular:component": {
+      "spec": false,
+      "flat": false,
+      "inlineStyle": true,
+      "inlineTemplate": false
+    },
+    "@schematics/angular:directive": {
+      "spec": false
+    },
+    "@schematics/angular:service": {
+      "spec": false
+    }
+  }
 }

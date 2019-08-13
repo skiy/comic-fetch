@@ -1,17 +1,7 @@
 <div class="alain-default__header-logo">
   <a [routerLink]="['/']" class="alain-default__header-logo-link">
-    <img
-      class="alain-default__header-logo-expanded"
-      src="./assets/logo-full.svg"
-      alt="{{ settings.app.name }}"
-      style="max-height:40px;"
-    />
-    <img
-      class="alain-default__header-logo-collapsed"
-      src="./assets/logo.svg"
-      alt="{{ settings.app.name }}"
-      style="max-height:30px;"
-    />
+    <img class="alain-default__header-logo-expanded" src="./assets/logo-full.svg" alt="{{settings.app.name}}" style="max-height:40px;" />
+    <img class="alain-default__header-logo-collapsed" src="./assets/logo.svg" alt="{{settings.app.name}}" style="max-height:30px;" />
   </a>
 </div>
 <div class="alain-default__nav-wrap">
@@ -19,7 +9,7 @@
     <!-- Menu -->
     <li>
       <div class="alain-default__nav-item" (click)="toggleCollapsedSidebar()">
-        <i nz-icon nzType="menu-{{ settings.layout.collapsed ? 'unfold' : 'fold' }}"></i>
+        <i nz-icon nzType="menu-{{settings.layout.collapsed ? 'unfold' : 'fold'}}"></i>
       </div>
     </li>
     <!-- Github Page -->
@@ -30,7 +20,7 @@
     </li>
     <!-- Lock Page -->
     <li class="hidden-mobile">
-      <div class="alain-default__nav-item" routerLink="/passport/lock">
+      <div class="alain-default__nav-item" [routerLink]="['/lock']">
         <i nz-icon nzType="lock"></i>
       </div>
     </li>
@@ -57,13 +47,7 @@
     </li>
     <!-- Settings -->
     <li class="hidden-mobile">
-      <div
-        class="alain-default__nav-item"
-        nz-dropdown
-        [nzDropdownMenu]="settingsMenu"
-        nzTrigger="click"
-        nzPlacement="bottomRight"
-      >
+      <div class="alain-default__nav-item" nz-dropdown [nzDropdownMenu]="settingsMenu" nzTrigger="click" nzPlacement="bottomRight">
         <i nz-icon nzType="setting"></i>
       </div>
       <nz-dropdown-menu #settingsMenu="nzDropdownMenu">
@@ -73,9 +57,6 @@
           </div>
           <div nz-menu-item>
             <header-storage></header-storage>
-          </div>
-          <div nz-menu-item>
-            <header-i18n></header-i18n>
           </div>
         </div>
       </nz-dropdown-menu>

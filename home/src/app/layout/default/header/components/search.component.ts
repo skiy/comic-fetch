@@ -9,7 +9,7 @@ import { Component, HostBinding, Input, ElementRef, AfterViewInit, ChangeDetecti
         [(ngModel)]="q"
         (focus)="qFocus()"
         (blur)="qBlur()"
-        [placeholder]="'menu.search.placeholder' | translate"
+        [placeholder]="'搜索：员工、文件、照片等'"
       />
     </nz-input-group>
   `,

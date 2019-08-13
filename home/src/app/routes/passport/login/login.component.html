@@ -1,23 +1,23 @@
 <form nz-form [formGroup]="form" (ngSubmit)="submit()" role="form">
   <nz-tabset [nzAnimated]="false" class="tabs" (nzSelectChange)="switch($event)">
-    <nz-tab [nzTitle]="'app.login.tab-login-credentials' | translate">
+    <nz-tab [nzTitle]="'账户密码登录'">
       <nz-alert *ngIf="error" [nzType]="'error'" [nzMessage]="error" [nzShowIcon]="true" class="mb-lg"></nz-alert>
       <nz-form-item>
-        <nz-form-control [nzErrorTip]="'Please enter mobile number!' | translate">
+        <nz-form-control [nzErrorTip]="'Please enter mobile number!'">
           <nz-input-group nzSize="large" nzPrefixIcon="user">
             <input nz-input formControlName="userName" placeholder="username: admin or user" />
           </nz-input-group>
         </nz-form-control>
       </nz-form-item>
       <nz-form-item>
-        <nz-form-control nzErrorTip="'Please enter password!' | translate">
+        <nz-form-control nzErrorTip="'Please enter password!'">
           <nz-input-group nzSize="large" nzPrefixIcon="lock">
             <input nz-input type="password" formControlName="password" placeholder="password: ng-alain.com" />
           </nz-input-group>
         </nz-form-control>
       </nz-form-item>
     </nz-tab>
-    <nz-tab [nzTitle]="'app.login.tab-login-mobile' | translate">
+    <nz-tab [nzTitle]="'手机号登录'">
       <nz-form-item>
         <nz-form-control [nzErrorTip]="mobileErrorTip">
           <nz-input-group nzSize="large" nzPrefixIcon="user">
@@ -25,16 +25,16 @@
           </nz-input-group>
           <ng-template #mobileErrorTip let-i>
             <ng-container *ngIf="i.errors.required">
-              {{ 'validation.phone-number.required' | translate }}
+              请输入手机号！
             </ng-container>
             <ng-container *ngIf="i.errors.pattern">
-              {{ 'validation.phone-number.wrong-format' | translate }}
+              手机号格式错误！
             </ng-container>
           </ng-template>
         </nz-form-control>
       </nz-form-item>
       <nz-form-item>
-        <nz-form-control [nzErrorTip]="'validation.verification-code.required' | translate">
+        <nz-form-control [nzErrorTip]="'请输入验证码！'">
           <nz-row [nzGutter]="8">
             <nz-col [nzSpan]="16">
               <nz-input-group nzSize="large" nzPrefixIcon="mail">
@@ -51,7 +51,7 @@
                 nzBlock
                 [nzLoading]="http.loading"
               >
-                {{ count ? count + 's' : ('app.register.get-verification-code' | translate) }}
+                {{ count ? count + 's' : ('获取验证码') }}
               </button>
             </nz-col>
           </nz-row>
@@ -61,20 +61,20 @@
   </nz-tabset>
   <nz-form-item>
     <nz-col [nzSpan]="12">
-      <label nz-checkbox formControlName="remember">{{ 'app.login.remember-me' | translate }}</label>
+      <label nz-checkbox formControlName="remember">自动登录</label>
     </nz-col>
     <nz-col [nzSpan]="12" class="text-right">
-      <a class="forgot" (click)="msg.error('请找欧阳锋')">{{ 'app.login.forgot-password' | translate }}</a>
+      <a class="forgot" (click)="msg.error('请找欧阳锋')">忘记密码</a>
     </nz-col>
   </nz-form-item>
   <nz-form-item>
     <button nz-button type="submit" nzType="primary" nzSize="large" [nzLoading]="http.loading" nzBlock>
-      {{ 'app.login.login' | translate }}
+      登录
     </button>
   </nz-form-item>
 </form>
 <div class="other">
-  {{ 'app.login.sign-in-with' | translate }}
+  其他登录方式
   <i
     nz-tooltip="in fact Auth0 via window"
     (click)="open('auth0', 'window')"
@@ -84,5 +84,5 @@
   ></i>
   <i nz-tooltip="in fact Github via redirect" (click)="open('github')" nz-icon nzType="taobao-circle" class="icon"></i>
   <i (click)="open('weibo', 'window')" nz-icon nzType="weibo-circle" class="icon"></i>
-  <a class="register" routerLink="/passport/register">{{ 'app.login.signup' | translate }}</a>
+  <a class="register" routerLink="/passport/register">注册账户</a>
 </div>
