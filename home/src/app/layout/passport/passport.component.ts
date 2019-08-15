@@ -20,4 +20,6 @@ export class LayoutPassportComponent {
       href: '',
     },
   ];
+
+  title = 'Login';
 }

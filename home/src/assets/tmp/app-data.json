@@ -1,7 +1,7 @@
 {
   "app": {
-    "name": "Alain",
-    "description": "Ng-zorro admin panel front-end framework"
+    "name": "Comic Fetch",
+    "description": "Comic Fetch for WebSite"
   },
   "user": {
     "name": "Admin",
