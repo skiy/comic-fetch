@@ -2657,6 +2657,18 @@ darker  @grey-9;
 // 可以通过 https://ng-alain.github.io/ng-alain/ 获取主题参数代码
 // The theme paraments can be generated at https://ng-alain.github.io/ng-alain/
 
+::ng-deep .register-password-cdk .success {
+  color: #52c41a;
+}
+::ng-deep .register-password-cdk .warning {
+  color: #faad14;
+}
+::ng-deep .register-password-cdk .error {
+  color: #f5222d;
+}
+::ng-deep .register-password-cdk .progress-pass > .progress .ant-progress-bg {
+  background-color: #faad14;
+}
 :host ::ng-deep .container {
   background: #f0f2f5;
 }
@@ -2672,17 +2684,11 @@ darker  @grey-9;
 :host ::ng-deep .icon:hover {
   color: @primary-color;
 }
-::ng-deep .register-password-cdk .success {
-  color: #52c41a;
-}
-::ng-deep .register-password-cdk .warning {
-  color: #faad14;
-}
-::ng-deep .register-password-cdk .error {
-  color: #f5222d;
-}
-::ng-deep .register-password-cdk .progress-pass > .progress .ant-progress-bg {
-  background-color: #faad14;
+:host ::ng-deep .inner {
+  background-color: #fff;
+  -webkit-box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  -moz-box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 html {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);

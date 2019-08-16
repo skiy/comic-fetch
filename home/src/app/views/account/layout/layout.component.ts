@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'layout-passport',
-  templateUrl: './passport.component.html',
-  styleUrls: ['./passport.component.less'],
+  selector: 'account-layout',
+  templateUrl: './layout.component.html',
+  styleUrls: ['./layout.component.less'],
 })
-export class LayoutPassportComponent {
+
+export class AccountLayoutComponent {
   links = [
     {
       title: '帮助',
@@ -21,5 +22,5 @@ export class LayoutPassportComponent {
     },
   ];
 
-  title = 'Login';
+  title = 'Voice Comic';
 }

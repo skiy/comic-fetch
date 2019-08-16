@@ -2,17 +2,18 @@
  * 进一步对基础模块的导入提炼
  * 有关模块注册指导原则请参考：https://ng-alain.com/docs/module
  */
-import { NgModule, Optional, SkipSelf, ModuleWithProviders } from '@angular/core';
-import { throwIfAlreadyLoaded } from '@core';
+import {NgModule, Optional, SkipSelf, ModuleWithProviders} from '@angular/core';
+import {throwIfAlreadyLoaded} from '@core';
 
-import { AlainThemeModule } from '@delon/theme';
-import { DelonACLModule } from '@delon/acl';
+import {AlainThemeModule} from '@delon/theme';
+import {DelonACLModule} from '@delon/acl';
 
 // #region mock
-import { DelonMockModule } from '@delon/mock';
+import {DelonMockModule} from '@delon/mock';
 import * as MOCKDATA from '../../_mock';
-import { environment } from '@env/environment';
-const MOCK_MODULES = true ? [DelonMockModule.forRoot({ data: MOCKDATA })] : [];
+import {environment} from '@env/environment';
+
+const MOCK_MODULES = true ? [DelonMockModule.forRoot({data: MOCKDATA})] : [];
 // #endregion
 
 // #region reuse-tab
@@ -27,8 +28,9 @@ const MOCK_MODULES = true ? [DelonMockModule.forRoot({ data: MOCKDATA })] : [];
  *  </section>
  *  ```
  */
-import { RouteReuseStrategy } from '@angular/router';
-import { ReuseTabService, ReuseTabStrategy } from '@delon/abc/reuse-tab';
+import {RouteReuseStrategy} from '@angular/router';
+import {ReuseTabService, ReuseTabStrategy} from '@delon/abc/reuse-tab';
+
 const REUSETAB_PROVIDES = [
   // {
   //   provide: RouteReuseStrategy,
@@ -40,7 +42,8 @@ const REUSETAB_PROVIDES = [
 
 // #region global config functions
 
-import { PageHeaderConfig } from '@delon/abc';
+import {PageHeaderConfig} from '@delon/abc';
+
 export function fnPageHeaderConfig(): PageHeaderConfig {
   return {
     ...new PageHeaderConfig(),
@@ -48,35 +51,42 @@ export function fnPageHeaderConfig(): PageHeaderConfig {
   };
 }
 
-import { DelonAuthConfig } from '@delon/auth';
+// auth check
+import {DelonAuthConfig} from '@delon/auth';
 export function fnDelonAuthConfig(): DelonAuthConfig {
   return {
     ...new DelonAuthConfig(),
-    login_url: '/passport/login',
+    login_url: '/account/login',
   };
 }
 
 // tslint:disable-next-line: no-duplicate-imports
-import { STConfig } from '@delon/abc';
+import {STConfig} from '@delon/abc';
+
 export function fnSTConfig(): STConfig {
   return {
     ...new STConfig(),
-    modal: { size: 'lg' },
+    modal: {size: 'lg'},
   };
 }
 
 const GLOBAL_CONFIG_PROVIDES = [
   // TIPS：@delon/abc 有大量的全局配置信息，例如设置所有 `st` 的页码默认为 `20` 行
-  { provide: STConfig, useFactory: fnSTConfig },
-  { provide: PageHeaderConfig, useFactory: fnPageHeaderConfig },
-  { provide: DelonAuthConfig, useFactory: fnDelonAuthConfig },
+  {provide: STConfig, useFactory: fnSTConfig},
+  {provide: PageHeaderConfig, useFactory: fnPageHeaderConfig},
+  {provide: DelonAuthConfig, useFactory: fnDelonAuthConfig},
 ];
 
 // #endregion
 
 @NgModule({
-  imports: [AlainThemeModule.forRoot(), DelonACLModule.forRoot(), ...MOCK_MODULES],
+  imports: [
+    AlainThemeModule.forRoot(),
+    DelonACLModule.forRoot(),
+    ...MOCK_MODULES
+  ],
 })
+
 export class DelonModule {
   constructor(@Optional() @SkipSelf() parentModule: DelonModule) {
     throwIfAlreadyLoaded(parentModule, 'DelonModule');

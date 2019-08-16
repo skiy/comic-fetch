@@ -5,16 +5,19 @@ import {environment} from '@env/environment';
 // layout
 import {LayoutDefaultComponent} from '../layout/default/default.component';
 import {LayoutFullScreenComponent} from '../layout/fullscreen/fullscreen.component';
-import {LayoutPassportComponent} from '../layout/passport/passport.component';
+
 // dashboard pages
 import {DashboardComponent} from './dashboard/dashboard.component';
 // passport pages
-import {UserLoginComponent} from './passport/login/login.component';
 import {UserRegisterComponent} from './passport/register/register.component';
 import {UserRegisterResultComponent} from './passport/register-result/register-result.component';
 // single pages
 import {CallbackComponent} from './callback/callback.component';
 import {UserLockComponent} from './passport/lock/lock.component';
+
+// account
+import {AccountLoginComponent} from '../views/account/login/login.component'
+import {AccountLayoutComponent} from "../views/account/layout/layout.component";
 
 const routes: Routes = [
   {
@@ -39,11 +42,11 @@ const routes: Routes = [
   // passport
   {
     path: 'passport',
-    component: LayoutPassportComponent,
+    component: AccountLayoutComponent,
     children: [
       {
         path: 'login',
-        component: UserLoginComponent,
+        component: AccountLoginComponent,
         data: {title: '登录', titleI18n: 'Login'}
       },
       {
@@ -65,6 +68,20 @@ const routes: Routes = [
   },
   // 单页不包裹Layout
   {path: 'callback/:type', component: CallbackComponent},
+
+  // Account
+  {
+    path: 'account',
+    component: AccountLayoutComponent,
+    children: [
+      {
+        path: 'login',
+        component: AccountLoginComponent,
+        data: {title: '登录', titleI18n: 'Login'}
+      }
+      ]
+  },
+
   {path: '**', redirectTo: 'exception/404'},
 ];
 

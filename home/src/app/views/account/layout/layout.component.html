@@ -1,0 +1,18 @@
+<div class="container">
+  <div class="wrap">
+    <div class="inner">
+      <div class="top">
+        <div class="head">
+          <img class="logo" src="./assets/logo-color.svg">
+          <span class="title">{{ title }}</span>
+        </div>
+      </div>
+      <router-outlet></router-outlet>
+    </div>
+    <global-footer [links]="links">
+      Copyright
+      <i nz-icon nzType="copyright"></i>
+      2019
+    </global-footer>
+  </div>
+</div>
