@@ -12,6 +12,10 @@
 2. 采集
 3. 可视化
 
+### 支持漫画站点
+- 漫画牛: https://www.manhuaniu.com
+- 漫画1234: https://www.mh1234.com
+
 ### 感谢
 - [https://github.com/gogf/gf]()
 

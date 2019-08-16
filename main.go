@@ -59,9 +59,6 @@ func main() {
 	//全核性能启用
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	//初始化服务
-	initialize()
-
 	flag.Parse()
 
 	if h { // 显示帮助
@@ -130,8 +127,8 @@ func checkConnectDB() (err error) {
 	return err
 }
 
-// initialize 初始化服务
-func initialize() {
+// init 初始化服务
+func init() {
 	//配置文件
 	cfg = ucfg.InitCfg()
 

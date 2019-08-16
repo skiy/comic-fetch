@@ -25,5 +25,9 @@ var (
 			pc:     "https://www.manhuaniu.com",
 			mobile: "https://m.manhuaniu.com",
 		},
+		"mh1234": {
+			pc:     "https://www.mh1234.com",
+			mobile: "https://www.mh1234.com",
+		},
 	}
 )

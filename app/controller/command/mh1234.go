@@ -24,23 +24,15 @@ import (
 	"time"
 )
 
-// Manhuaniu 漫画牛
-type Manhuaniu struct {
+// Mh1234 漫画1234
+type Mh1234 struct {
 	Books  *model.TbBooks
 	WebURL string
 	ResURL string
 }
 
-// NewManhuaniu Manhuaniu init
-func NewManhuaniu(books *model.TbBooks) *Manhuaniu {
-	t := &Manhuaniu{}
-	t.Books = books
-	t.ResURL = "https://res.nbhbzl.com"
-	return t
-}
-
 // ToFetch 采集
-func (t *Manhuaniu) ToFetch() (err error) {
+func (t *Mh1234) ToFetch() (err error) {
 	log := ulog.Log
 
 	web := webURL[t.Books.OriginFlag]
@@ -59,8 +51,6 @@ func (t *Manhuaniu) ToFetch() (err error) {
 	if len(chapterURLList) == 0 {
 		return errors.New("获取不到章节数据")
 	}
-
-	//log.Println(chapterURLList)
 
 	db := udb.GetDatabase()
 
@@ -89,7 +79,7 @@ func (t *Manhuaniu) ToFetch() (err error) {
 
 	// 这里应该用 channel 并发获取章节数据
 	for _, chapterURL := range chapterURLList {
-		preg := `\/([0-9]*).html`
+		preg := `\/wap\/comic\/[0-9]*/([0-9]*).html`
 		re, err := regexp.Compile(preg)
 		if err != nil {
 			log.Warningf("章节ID正则执行失败: %v, URL: %s", err, chapterURL)
@@ -132,7 +122,7 @@ func (t *Manhuaniu) ToFetch() (err error) {
 		}
 
 		var episodeID int
-		preg2 := `第([0-9]*)[话章]`
+		preg2 := `^([0-9]*)`
 		re2 := regexp.MustCompile(preg2)
 		episodeIDs := re2.FindStringSubmatch(chapterName)
 
@@ -250,7 +240,7 @@ func (t *Manhuaniu) ToFetch() (err error) {
 }
 
 // ToFetchChapterList 采集章节 URL 列表
-func (t *Manhuaniu) ToFetchChapterList() (chapterURLList g.SliceStr, err error) {
+func (t *Mh1234) ToFetchChapterList() (chapterURLList g.SliceStr, err error) {
 	doc, err := fetch.PageSource(t.Books.OriginURL, "utf-8")
 	if err != nil {
 		return nil, err
@@ -270,13 +260,13 @@ func (t *Manhuaniu) ToFetchChapterList() (chapterURLList g.SliceStr, err error) 
 }
 
 // ToFetchChapter 获取章节内容
-func (t *Manhuaniu) ToFetchChapter(chapterURL string) (chapterName string, imageURLList g.SliceStr, err error) {
+func (t *Mh1234) ToFetchChapter(chapterURL string) (chapterName string, imageURLList g.SliceStr, err error) {
 	doc, err := fetch.PageSource(chapterURL, "utf-8")
 	if err != nil {
 		return
 	}
 
-	scriptImageText := doc.Find("script").Eq(2).Text()
+	scriptImageText := doc.Find("script").Eq(1).Text()
 
 	chapterPath := ""
 	pregPath := `chapterPath = "([^"]*)"`
@@ -325,14 +315,14 @@ func (t *Manhuaniu) ToFetchChapter(chapterURL string) (chapterName string, image
 		return
 	}
 
-	scriptNameText := doc.Find("script").Eq(22).Text()
+	scriptNameText := doc.Find("script").Eq(23).Text()
 
 	pregInfo := `SinMH\.initChapter\(([^;]*)\)`
-	re2, err := regexp.Compile(pregInfo)
+	re3, err := regexp.Compile(pregInfo)
 	if err != nil {
 		return "", nil, err
 	}
-	infos := re2.FindStringSubmatch(scriptNameText)
+	infos := re3.FindStringSubmatch(scriptNameText)
 
 	if len(infos) == 2 {
 		infoStr := strings.ReplaceAll(infos[1], `"`, "")
@@ -344,4 +334,12 @@ func (t *Manhuaniu) ToFetchChapter(chapterURL string) (chapterName string, image
 	}
 
 	return
+}
+
+// NewMh1234 Mh1234 init
+func NewMh1234(books *model.TbBooks) *Mh1234 {
+	t := &Mh1234{}
+	t.Books = books
+	t.ResURL = "https://mhpic.dongzaojiage.com"
+	return t
 }

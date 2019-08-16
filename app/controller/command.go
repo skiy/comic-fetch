@@ -6,6 +6,7 @@ import (
 	"github.com/skiy/comic-fetch/app/controller/command"
 	"github.com/skiy/comic-fetch/app/model"
 	"github.com/skiy/gf-utils/udb"
+	"github.com/skiy/gf-utils/ulog"
 )
 
 // Command Command
@@ -41,6 +42,8 @@ func (t *Command) Start() (err error) {
 			return err
 		}
 
+		ulog.Log.Infof("\n正在采集漫画: %s\n源站: %s\n源站漫画URL: %s\n", book.Name, book.OriginWeb, book.OriginURL)
+
 		err = ctrl.ToFetch()
 		if err != nil {
 			return err
@@ -56,6 +59,9 @@ func (t *Command) ctrl(name string, books *model.TbBooks) (ctrl command.Controll
 
 	case "manhuaniu":
 		ctrl = command.NewManhuaniu(books)
+
+	case "mh1234":
+		ctrl = command.NewMh1234(books)
 
 	default:
 		err = errors.New("can not fetch this comic website. ")
