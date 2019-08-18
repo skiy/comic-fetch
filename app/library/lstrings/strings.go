@@ -1,4 +1,4 @@
-package strings
+package lstrings
 
 // Addslashes 函数返回在预定义字符之前添加反斜杠的字符串。
 // 预定义字符是：

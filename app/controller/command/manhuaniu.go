@@ -9,9 +9,9 @@ import (
 	"github.com/gogf/gf/g/crypto/gmd5"
 	"github.com/gogf/gf/g/os/gfile"
 	"github.com/skiy/comic-fetch/app/config"
-	"github.com/skiy/comic-fetch/app/library/fetch"
-	"github.com/skiy/comic-fetch/app/library/filepath"
-	libStrings "github.com/skiy/comic-fetch/app/library/strings"
+	"github.com/skiy/comic-fetch/app/library/lfetch"
+	"github.com/skiy/comic-fetch/app/library/lfilepath"
+	"github.com/skiy/comic-fetch/app/library/lstrings"
 	"github.com/skiy/comic-fetch/app/model"
 	"github.com/skiy/gf-utils/ucfg"
 	"github.com/skiy/gf-utils/udb"
@@ -177,7 +177,7 @@ func (t *Manhuaniu) ToFetch() (err error) {
 
 			// 图片本地化
 			if imageLocal {
-				if res, err := fetch.GetResponse(fullImageOriginURL, fullChapterURL); err != nil {
+				if res, err := lfetch.GetResponse(fullImageOriginURL, fullChapterURL); err != nil {
 					log.Warningf("远程获取图片本地化失败: %v", err)
 				} else {
 					fileName := fmt.Sprintf("%d-%d-%d", t.Books.ID, chapterInfo.ID, index)
@@ -189,7 +189,7 @@ func (t *Manhuaniu) ToFetch() (err error) {
 						}
 					}
 
-					fileExt := filepath.Ext(fullImageOriginURL)
+					fileExt := lfilepath.Ext(fullImageOriginURL)
 					if fileExt == "" {
 						fileExt = ".jpg"
 					}
@@ -251,7 +251,7 @@ func (t *Manhuaniu) ToFetch() (err error) {
 
 // ToFetchChapterList 采集章节 URL 列表
 func (t *Manhuaniu) ToFetchChapterList() (chapterURLList g.SliceStr, err error) {
-	doc, err := fetch.PageSource(t.Books.OriginURL, "utf-8")
+	doc, err := lfetch.PageSource(t.Books.OriginURL, "utf-8")
 	if err != nil {
 		return nil, err
 	}
@@ -271,7 +271,7 @@ func (t *Manhuaniu) ToFetchChapterList() (chapterURLList g.SliceStr, err error) 
 
 // ToFetchChapter 获取章节内容
 func (t *Manhuaniu) ToFetchChapter(chapterURL string) (chapterName string, imageURLList g.SliceStr, err error) {
-	doc, err := fetch.PageSource(chapterURL, "utf-8")
+	doc, err := lfetch.PageSource(chapterURL, "utf-8")
 	if err != nil {
 		return
 	}
@@ -317,7 +317,7 @@ func (t *Manhuaniu) ToFetchChapter(chapterURL string) (chapterName string, image
 
 	for _, images := range imagesList {
 		if len(images) == 2 {
-			imageURLList = append(imageURLList, "/"+strings.TrimLeft(libStrings.Stripslashes(chapterPath+images[1]), "/"))
+			imageURLList = append(imageURLList, "/"+strings.TrimLeft(lstrings.Stripslashes(chapterPath+images[1]), "/"))
 		}
 	}
 

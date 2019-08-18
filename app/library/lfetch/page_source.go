@@ -1,4 +1,4 @@
-package fetch
+package lfetch
 
 import (
 	"bytes"
@@ -14,8 +14,7 @@ import (
 // @pageChartset string 网页字符集编码 (GBK,GB2312,UTF-8,GB18030)
 // @return @doc DOM, @err error
 func PageSource(sourceURL, pageChartset string) (doc *goquery.Document, err error) {
-	c := ghttp.NewClient()
-	response, err := c.Get(sourceURL)
+	response, err := GetResponse(sourceURL, sourceURL)
 	if err != nil {
 		return nil, err
 	}
