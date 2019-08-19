@@ -31,16 +31,26 @@ type Mh1234 struct {
 	ResURL string
 }
 
+// AddBook Add new comic
+func (t *Mh1234) AddBook(siteURL string) (err error) {
+	t.WebURL = siteURL
+	return
+}
+
 // ToFetch 采集
 func (t *Mh1234) ToFetch() (err error) {
 	log := ulog.Log
 
-	web := webURL[t.Books.OriginFlag]
-	if len(web) < t.Books.OriginWebType {
-		return errors.New("runtime error: index out of range for origin_web_type")
+	web, ok := config.WebURL[t.Books.OriginFlag]
+	if ok {
+		t.WebURL = web[t.Books.OriginWebType]
+	} else {
+		return errors.New("index out of range for origin_web_type: " + t.Books.OriginFlag)
 	}
 
-	t.WebURL = web[t.Books.OriginWebType]
+	if t.WebURL == "" {
+		return errors.New("WebURL is nil: " + t.Books.OriginFlag)
+	}
 
 	// 采集章节列表
 	chapterURLList, err := t.ToFetchChapterList()

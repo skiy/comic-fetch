@@ -39,16 +39,45 @@ func NewManhuaniu(books *model.TbBooks) *Manhuaniu {
 	return t
 }
 
+// AddBook Add new comic
+func (t *Manhuaniu) AddBook(siteURL string) (err error) {
+	t.WebURL = siteURL
+
+	t.Books.OriginURL = fmt.Sprintf("%s/manhua/%d/", t.WebURL, t.Books.OriginBookID)
+
+	if err = t.ToFetchBook(); err != nil {
+		return err
+	}
+
+	timeNow := time.Now().Unix()
+	t.Books.UpdatedAt = timeNow
+	t.Books.CreatedAt = timeNow
+
+	bookModel := model.NewBooks()
+	bookRes, err := bookModel.AddData(t.Books)
+	if err != nil {
+		return err
+	}
+
+	t.Books.ID, _ = bookRes.LastInsertId()
+
+	return t.ToFetch()
+}
+
 // ToFetch 采集
 func (t *Manhuaniu) ToFetch() (err error) {
 	log := ulog.Log
 
-	web := webURL[t.Books.OriginFlag]
-	if len(web) < t.Books.OriginWebType {
-		return errors.New("runtime error: index out of range for origin_web_type")
+	web, ok := config.WebURL[t.Books.OriginFlag]
+	if ok {
+		t.WebURL = web[t.Books.OriginWebType]
+	} else {
+		return errors.New("index out of range for origin_web_type: " + t.Books.OriginFlag)
 	}
 
-	t.WebURL = web[t.Books.OriginWebType]
+	if t.WebURL == "" {
+		return errors.New("WebURL is nil: " + t.Books.OriginFlag)
+	}
 
 	// 采集章节列表
 	chapterURLList, err := t.ToFetchChapterList()
@@ -247,6 +276,31 @@ func (t *Manhuaniu) ToFetch() (err error) {
 	}
 
 	return
+}
+
+// ToFetchBook 获取漫画信息
+func (t *Manhuaniu) ToFetchBook() (err error) {
+	doc, err := lfetch.PageSource(t.Books.OriginURL, "utf-8")
+	if err != nil {
+		return err
+	}
+
+	bookInfo := doc.Find("img.pic")
+
+	if src, ok := bookInfo.Attr("src"); ok {
+		if src != "" {
+			t.Books.OriginImageURL = src
+		}
+	}
+
+	if name, ok := bookInfo.Attr("alt"); ok {
+		if name != "" {
+			t.Books.Name = name
+			return nil
+		}
+	}
+
+	return errors.New("漫画标题获取失败")
 }
 
 // ToFetchChapterList 采集章节 URL 列表

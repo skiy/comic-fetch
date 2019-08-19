@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"github.com/gogf/gf/g"
 	"github.com/gogf/gf/g/os/gcfg"
 	"github.com/gogf/gf/g/os/glog"
+	"github.com/skiy/comic-fetch/app/config"
 	"github.com/skiy/comic-fetch/app/controller"
 	"github.com/skiy/gf-utils/ucfg"
 	"github.com/skiy/gf-utils/udb"
@@ -97,7 +99,7 @@ func main() {
 
 		// default cli
 		Action: func(c *cli.Context) error {
-			start("command")
+			cliStart()
 			return nil
 		},
 
@@ -110,7 +112,7 @@ func main() {
 				Action: func(c *cli.Context) error {
 					cmd.port = c.Int("port")
 					fmt.Println("Comic website run: ", cmd.port)
-					start("web")
+					webStart()
 					return nil
 				},
 				// web port
@@ -130,7 +132,7 @@ func main() {
 				Usage: "Comic fetch run",
 				Action: func(c *cli.Context) error {
 					fmt.Println("Comic fetch run")
-					start("command")
+					cliStart()
 					return nil
 				},
 				Subcommands: []*cli.Command{
@@ -140,9 +142,24 @@ func main() {
 						Usage: "Add a new comic",
 						Action: func(c *cli.Context) error {
 							site := c.String("site")
-							id := c.String("id")
+							id := c.Int("id")
 
-							fmt.Println("Add a new comic: ", site, id)
+							if id == 0 {
+								log.Warningf("漫画 (%s) 参数 id 缺失", site)
+								return nil
+							}
+
+							if _, ok := config.WebURL[site]; ok {
+								cliApp := controller.NewCommand()
+
+								if err := cliApp.Add(site, id); err != nil {
+									log.Fatalf("添加新漫画失败: %s", err.Error())
+									return nil
+								}
+							} else {
+								log.Warningf("不支持此网站 (%v) 添加新漫画", site)
+							}
+
 							return nil
 						},
 						Flags: cliFlags,
@@ -153,9 +170,24 @@ func main() {
 						Usage: "Update a comic",
 						Action: func(c *cli.Context) error {
 							site := c.String("site")
-							id := c.String("id")
+							id := c.Int("id")
 
 							fmt.Println("Update a comic: ", site, id)
+
+							cliApp := controller.NewCommand()
+							where := g.Map{
+								"origin_flag": site,
+							}
+
+							if id != 0 {
+								where["origin_book_id"] = id
+							}
+
+							if err := cliApp.Update(where); err != nil {
+								log.Fatalf("更新漫画失败: %s", err.Error())
+								return nil
+							}
+
 							return nil
 						},
 						Flags: cliFlags,
@@ -171,24 +203,34 @@ func main() {
 	app.Run(os.Args)
 }
 
-// start app / web start
-func start(flag string) {
+// webStart web run
+func webStart() {
 	// 判断 MYSQL 连接是否正常
 	if err := checkConnectDB(); err != nil {
-		ulog.Log.Fatalf("数据库连接失败: %s", err.Error())
+		log.Fatalf("数据库连接失败: %s", err.Error())
 	}
 
-	var app controller.Controller
-	if flag == "command" {
-		app = controller.NewCommand()
-	} else {
-		app = controller.NewWeb()
-		app.SetPort(cmd.port)
-	}
+	app := controller.NewWeb()
+	app.Port = cmd.port
 
 	// 启动
 	if err := app.Start(); err != nil {
-		ulog.Log.Fatalf("程序启动失败: %s", err.Error())
+		log.Fatalf("WEB 程序启动失败: %s", err.Error())
+	}
+}
+
+// cliStart cli run
+func cliStart() {
+	// 判断 MYSQL 连接是否正常
+	if err := checkConnectDB(); err != nil {
+		log.Fatalf("数据库连接失败: %s", err.Error())
+	}
+
+	app := controller.NewCommand()
+
+	// 启动
+	if err := app.Update(g.Map{}); err != nil {
+		log.Fatalf("CLI 程序启动失败: %s", err.Error())
 	}
 }
 
