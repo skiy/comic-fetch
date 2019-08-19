@@ -34,7 +34,26 @@ type Mh1234 struct {
 // AddBook Add new comic
 func (t *Mh1234) AddBook(siteURL string) (err error) {
 	t.WebURL = siteURL
-	return
+
+	t.Books.OriginURL = fmt.Sprintf("%s/wap/comic/%d.html", t.WebURL, t.Books.OriginBookID)
+
+	if err = t.ToFetchBook(); err != nil {
+		return err
+	}
+
+	timeNow := time.Now().Unix()
+	t.Books.UpdatedAt = timeNow
+	t.Books.CreatedAt = timeNow
+
+	bookModel := model.NewBooks()
+	bookRes, err := bookModel.AddData(t.Books)
+	if err != nil {
+		return err
+	}
+
+	t.Books.ID, _ = bookRes.LastInsertId()
+
+	return t.ToFetch()
 }
 
 // ToFetch 采集
@@ -247,6 +266,31 @@ func (t *Mh1234) ToFetch() (err error) {
 	}
 
 	return
+}
+
+// ToFetchBook 获取漫画信息
+func (t *Mh1234) ToFetchBook() (err error) {
+	doc, err := lfetch.PageSource(t.Books.OriginURL, "utf-8")
+	if err != nil {
+		return err
+	}
+
+	bookInfo := doc.Find("#Cover>img")
+
+	if src, ok := bookInfo.Attr("src"); ok {
+		if src != "" {
+			t.Books.OriginImageURL = src
+		}
+	}
+
+	if name, ok := bookInfo.Attr("alt"); ok {
+		if name != "" {
+			t.Books.Name = name
+			return nil
+		}
+	}
+
+	return errors.New("漫画标题获取失败")
 }
 
 // ToFetchChapterList 采集章节 URL 列表

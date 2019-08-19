@@ -256,7 +256,6 @@ func checkConnectDB() (err error) {
 
 // load 加载配置信息
 func load() {
-	fmt.Println(cmd.config)
 	if cmd.config != "" {
 		lcfg.SetCfgName(cmd.config)
 	} else {
@@ -274,6 +273,4 @@ func load() {
 
 	//日志配置
 	log = llog.ReadLog()
-
-	log.Println(cfg.Get("log.level"))
 }
