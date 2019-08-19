@@ -115,9 +115,11 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 
 .idea/
+honme/
 
 dist/
 logs/
 upload/
 
-config.toml
+config.*.toml
+comic

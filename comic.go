@@ -7,9 +7,9 @@ import (
 	"github.com/gogf/gf/g/os/glog"
 	"github.com/skiy/comic-fetch/app/config"
 	"github.com/skiy/comic-fetch/app/controller"
-	"github.com/skiy/gf-utils/ucfg"
-	"github.com/skiy/gf-utils/udb"
-	"github.com/skiy/gf-utils/ulog"
+	"github.com/skiy/comic-fetch/app/library/lcfg"
+	"github.com/skiy/comic-fetch/app/library/ldb"
+	"github.com/skiy/comic-fetch/app/library/llog"
 	"gopkg.in/urfave/cli.v2"
 	"os"
 	"runtime"
@@ -18,10 +18,11 @@ import (
 )
 
 type command struct {
-	help bool   // h 帮助
-	lang string // l 语言
-	cmd  string // web / cli 启动方式
-	port int    // --port WEB 端口
+	help   bool   // h 帮助
+	lang   string // l 语言
+	cmd    string // web / cli 启动方式
+	port   int    // --port WEB 端口
+	config string // --config 配置文件路径
 }
 
 var (
@@ -73,7 +74,7 @@ func main() {
 		Version:  version,
 		Compiled: time.Now(),
 		Authors: []*cli.Author{
-			&cli.Author{
+			{
 				Name:  author,
 				Email: email,
 			},
@@ -89,16 +90,16 @@ func main() {
 			//	//EnvVars: []string{"LANG"},
 			//},
 
-			//&cli.IntFlag{
-			//	Name:    "port",
-			//	Usage:   "set website port",
-			//	Value: 0,
-			//	DefaultText: "random",
-			//},
+			&cli.StringFlag{
+				Name:    "config",
+				Aliases: []string{"c"},
+				Usage:   "Load configuration from `FILE`",
+			},
 		},
 
 		// default cli
 		Action: func(c *cli.Context) error {
+			cmd.config = c.String("config")
 			cliStart()
 			return nil
 		},
@@ -110,8 +111,9 @@ func main() {
 				Name:  "web",
 				Usage: "Comic website run",
 				Action: func(c *cli.Context) error {
+					cmd.config = c.String("config")
 					cmd.port = c.Int("port")
-					fmt.Println("Comic website run: ", cmd.port)
+
 					webStart()
 					return nil
 				},
@@ -121,6 +123,7 @@ func main() {
 						Name:        "port",
 						Usage:       "set website port",
 						Value:       0,
+						Aliases:     []string{"p"},
 						DefaultText: "0",
 					},
 				},
@@ -131,7 +134,8 @@ func main() {
 				Name:  "cli",
 				Usage: "Comic fetch run",
 				Action: func(c *cli.Context) error {
-					fmt.Println("Comic fetch run")
+					cmd.config = c.String("config")
+
 					cliStart()
 					return nil
 				},
@@ -141,6 +145,9 @@ func main() {
 						Name:  "add",
 						Usage: "Add a new comic",
 						Action: func(c *cli.Context) error {
+							cmd.config = c.String("config")
+							load()
+
 							site := c.String("site")
 							id := c.Int("id")
 
@@ -169,10 +176,11 @@ func main() {
 						Name:  "update",
 						Usage: "Update a comic",
 						Action: func(c *cli.Context) error {
+							cmd.config = c.String("config")
+							load()
+
 							site := c.String("site")
 							id := c.Int("id")
-
-							fmt.Println("Update a comic: ", site, id)
 
 							cliApp := controller.NewCommand()
 							where := g.Map{
@@ -205,6 +213,8 @@ func main() {
 
 // webStart web run
 func webStart() {
+	load()
+
 	// 判断 MYSQL 连接是否正常
 	if err := checkConnectDB(); err != nil {
 		log.Fatalf("数据库连接失败: %s", err.Error())
@@ -221,6 +231,8 @@ func webStart() {
 
 // cliStart cli run
 func cliStart() {
+	load()
+
 	// 判断 MYSQL 连接是否正常
 	if err := checkConnectDB(); err != nil {
 		log.Fatalf("数据库连接失败: %s", err.Error())
@@ -236,20 +248,32 @@ func cliStart() {
 
 // checkConnectDB 检测数据库连接是否正常
 func checkConnectDB() (err error) {
-	if err = udb.GetDatabase().PingMaster(); err != nil {
+	if err = ldb.GetDatabase().PingMaster(); err != nil {
 		return fmt.Errorf("%s(Database)", err.Error())
 	}
 	return err
 }
 
-// init 初始化服务
-func init() {
+// load 加载配置信息
+func load() {
+	fmt.Println(cmd.config)
+	if cmd.config != "" {
+		lcfg.SetCfgName(cmd.config)
+	} else {
+		envDev := os.Getenv("ENVIRONMENT")
+		if envDev == "dev" || envDev == "develop" {
+			lcfg.SetCfgName("config.env.toml")
+		}
+	}
+
 	//配置文件
-	cfg = ucfg.InitCfg()
+	cfg = lcfg.InitCfg()
 
 	//日志初始化
-	ulog.InitLog()
+	llog.InitLog()
 
 	//日志配置
-	log = ulog.ReadLog()
+	log = llog.ReadLog()
+
+	log.Println(cfg.Get("log.level"))
 }

@@ -2,7 +2,8 @@ package controller
 
 import (
 	"github.com/gogf/gf/g"
-	"github.com/skiy/gf-utils/ucfg"
+	"github.com/skiy/comic-fetch/app/library/lcfg"
+	"github.com/skiy/comic-fetch/app/library/llog"
 
 	// router
 	_ "github.com/skiy/comic-fetch/app/router"
@@ -21,14 +22,22 @@ func NewWeb() *Web {
 
 // Start Web start
 func (t *Web) Start() (err error) {
+	// WEB 端口
 	if t.Port <= 0 || t.Port > 65535 {
 		t.Port = 33001
-		if port := ucfg.InitCfg().GetInt("server.http.port"); port != 0 {
+		if port := lcfg.InitCfg().GetInt("server.http.port"); port != 0 {
 			t.Port = port
 		}
 	}
 
 	s := g.Server()
+
+	// 静态网站路径
+	if distPath := lcfg.GetCfg().GetString("setting.template"); distPath != "" {
+		llog.Log.Println(2, distPath)
+		s.AddSearchPath(distPath)
+	}
+
 	s.SetPort(t.Port)
 
 	// 关闭平滑重启功能

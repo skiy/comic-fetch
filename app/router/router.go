@@ -11,7 +11,6 @@ func init() {
 	// Static setting
 	//s.SetIndexFolder(true)
 	//s.SetServerRoot(".")
-	s.AddSearchPath("dist")
 
 	//s.AddStaticPath("/", "home/index.html")
 	//s.AddStaticPath("/static", "home/static")

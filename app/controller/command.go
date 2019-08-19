@@ -8,8 +8,8 @@ import (
 	"github.com/gogf/gf/g/util/gconv"
 	"github.com/skiy/comic-fetch/app/config"
 	"github.com/skiy/comic-fetch/app/controller/command"
+	"github.com/skiy/comic-fetch/app/library/llog"
 	"github.com/skiy/comic-fetch/app/model"
-	"github.com/skiy/gf-utils/ulog"
 )
 
 // Command Command
@@ -50,7 +50,7 @@ func (t *Command) Update(where interface{}) (err error) {
 			return err
 		}
 
-		ulog.Log.Infof("\n正在采集漫画: %s\n源站: %s\n源站漫画URL: %s\n", book.Name, book.OriginWeb, book.OriginURL)
+		llog.Log.Infof("\n正在采集漫画: %s\n源站: %s\n源站漫画URL: %s\n", book.Name, book.OriginWeb, book.OriginURL)
 
 		err = ctrl.ToFetch()
 		if err != nil {
@@ -107,7 +107,7 @@ func (t *Command) Add(flag string, bookID int) (err error) {
 		return err
 	}
 
-	ulog.Log.Infof("\n正在新增漫画 \n源站: %s\n源站漫画ID: %d\n", book.OriginWeb, book.OriginBookID)
+	llog.Log.Infof("\n正在新增漫画 \n源站: %s\n源站漫画ID: %d\n", book.OriginWeb, book.OriginBookID)
 
 	err = ctrl.AddBook(siteURL)
 	if err != nil {

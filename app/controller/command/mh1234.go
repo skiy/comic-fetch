@@ -9,13 +9,13 @@ import (
 	"github.com/gogf/gf/g/crypto/gmd5"
 	"github.com/gogf/gf/g/os/gfile"
 	"github.com/skiy/comic-fetch/app/config"
+	"github.com/skiy/comic-fetch/app/library/lcfg"
+	"github.com/skiy/comic-fetch/app/library/ldb"
 	"github.com/skiy/comic-fetch/app/library/lfetch"
 	"github.com/skiy/comic-fetch/app/library/lfilepath"
+	"github.com/skiy/comic-fetch/app/library/llog"
 	"github.com/skiy/comic-fetch/app/library/lstrings"
 	"github.com/skiy/comic-fetch/app/model"
-	"github.com/skiy/gf-utils/ucfg"
-	"github.com/skiy/gf-utils/udb"
-	"github.com/skiy/gf-utils/ulog"
 	"io"
 	"os"
 	"regexp"
@@ -39,7 +39,7 @@ func (t *Mh1234) AddBook(siteURL string) (err error) {
 
 // ToFetch 采集
 func (t *Mh1234) ToFetch() (err error) {
-	log := ulog.Log
+	log := llog.Log
 
 	web, ok := config.WebURL[t.Books.OriginFlag]
 	if ok {
@@ -62,7 +62,7 @@ func (t *Mh1234) ToFetch() (err error) {
 		return errors.New("获取不到章节数据")
 	}
 
-	db := udb.GetDatabase()
+	db := ldb.GetDatabase()
 
 	// 从数据库中获取已采集的章节列表
 	chapters := ([]model.TbChapters)(nil)
@@ -81,7 +81,7 @@ func (t *Mh1234) ToFetch() (err error) {
 	}
 
 	orderID := len(chapters)
-	cfg := ucfg.GetCfg()
+	cfg := lcfg.GetCfg()
 
 	imageLocal := cfg.GetBool("image.local")
 	filePath := cfg.GetString("image.path")
