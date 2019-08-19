@@ -9,7 +9,9 @@ import (
 )
 
 // Web Web
-type Web struct{}
+type Web struct {
+	port int
+}
 
 // NewWeb Web init
 func NewWeb() *Web {
@@ -17,15 +19,22 @@ func NewWeb() *Web {
 	return t
 }
 
+// SetPort Set web port with cli
+func (t *Web) SetPort(port int) {
+	t.port = port
+}
+
 // Start Web start
 func (t *Web) Start() (err error) {
-	httpPort := 33001
-	if p := ucfg.InitCfg().GetInt("server.http.port"); p != 0 {
-		httpPort = p
+	if t.port <= 0 || t.port > 65535 {
+		t.port = 33001
+		if port := ucfg.InitCfg().GetInt("server.http.port"); port != 0 {
+			t.port = port
+		}
 	}
 
 	s := g.Server()
-	s.SetPort(httpPort)
+	s.SetPort(t.port)
 
 	err = s.Start()
 	if err != nil {

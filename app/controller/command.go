@@ -12,6 +12,9 @@ import (
 // Command Command
 type Command struct{}
 
+// SetPort disable
+func (t *Command) SetPort(port int) {}
+
 // NewCommand Command init
 func NewCommand() *Command {
 	t := &Command{}

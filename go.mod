@@ -8,4 +8,5 @@ require (
 	github.com/skiy/gf-utils v0.0.0-20190801094441-e3d69e48dab6
 	golang.org/x/net v0.0.0-20190724013045-ca1201d0de80 // indirect
 	google.golang.org/appengine v1.6.1 // indirect
+	gopkg.in/urfave/cli.v2 v2.0.0-20190806201727-b62605953717 // indirect
 )

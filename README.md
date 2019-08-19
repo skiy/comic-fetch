@@ -1,16 +1,20 @@
 ## 漫画采集
 
 ### 开发进度
-1. 基础框架
-- cli
->> cli
+#### 总体需求
+- 公共规则
+> 很多网站都是用同一套 CMS 开发的，所以很多站点的规则都是一样的。
+#### 基础框架
+- command
+>> 帮助中心编写
 - web
 >> 主页
 >>> 静态资源、
 - api
 >> api
-2. 采集
-3. 可视化
+
+#### 采集
+#### 可视化
 
 ### 支持漫画站点
 - 漫画牛: https://www.manhuaniu.com
@@ -18,6 +22,7 @@
 
 ### 感谢
 - [https://github.com/gogf/gf]()
+- [https://github.com/urfave/cli]()
 
 ### 作者
 Author: Skiychan   

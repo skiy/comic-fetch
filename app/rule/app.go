@@ -2,7 +2,6 @@ package rule
 
 // App App
 type App struct {
-
 }
 
 // NewApp App init
