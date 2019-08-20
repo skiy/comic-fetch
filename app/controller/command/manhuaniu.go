@@ -10,7 +10,6 @@ import (
 	"github.com/gogf/gf/g/os/gfile"
 	"github.com/skiy/comic-fetch/app/config"
 	"github.com/skiy/comic-fetch/app/library/lcfg"
-	"github.com/skiy/comic-fetch/app/library/ldb"
 	"github.com/skiy/comic-fetch/app/library/lfetch"
 	"github.com/skiy/comic-fetch/app/library/lfilepath"
 	"github.com/skiy/comic-fetch/app/library/llog"
@@ -93,7 +92,7 @@ func (t *Manhuaniu) ToFetch() (err error) {
 
 	// 从数据库中获取已采集的章节列表
 	chapterModel := model.NewChapters()
-	chapterRes, err := chapterModel.GetDataOne(g.Map{})
+	chapterRes, err := chapterModel.GetData(g.Map{})
 	if err != nil {
 		if err != sql.ErrNoRows {
 			return err
@@ -101,8 +100,8 @@ func (t *Manhuaniu) ToFetch() (err error) {
 		err = nil
 	}
 
-	chapters := ([]model.TbChapters)(nil)
-	if err := chapterRes.ToStruct(chapters); err != nil {
+	var chapters []model.TbChapters
+	if err := chapterRes.ToStructs(&chapters); err != nil {
 		return err
 	}
 
@@ -190,13 +189,15 @@ func (t *Manhuaniu) ToFetch() (err error) {
 			chapter.CreatedAt = timestamp
 			chapter.UpdatedAt = timestamp
 
-			if res, err := db.Table(config.TbNameChapters).Data(chapter).Insert(); err != nil {
+			if res, err := chapterModel.AddData(chapter); err != nil {
 				log.Warningf("新章节: %s, URL: %s, 保存失败", chapterName, fullChapterURL)
 			} else {
 				orderID++
 				chapterInfo.ID, _ = res.LastInsertId()
 			}
 		}
+
+		imageModel := model.NewImages()
 
 		var imageDataArr []model.TbImages
 		for index, imageOriginURL := range imageURLList {
@@ -263,7 +264,7 @@ func (t *Manhuaniu) ToFetch() (err error) {
 
 		//break
 		// 保存图片数据
-		if _, err := db.Table(config.TbNameImages).Data(imageDataArr).Batch(len(imageDataArr)).Insert(); err != nil {
+		if _, err := imageModel.AddDataBatch(imageDataArr, 0); err != nil {
 			log.Warningf("图片批量保存到数据库失败: %v", err)
 		} else { // 图片保存成功
 			chapterData := g.Map{
@@ -271,7 +272,7 @@ func (t *Manhuaniu) ToFetch() (err error) {
 				"updated_at": time.Now().Unix(),
 			}
 
-			if _, err := db.Table(config.TbNameChapters).Data(chapterData).Where(g.Map{"id": chapterInfo.ID}).Update(); err != nil {
+			if _, err := chapterModel.UpdateData(chapterData, g.Map{"id": chapterInfo.ID}); err != nil {
 				log.Warningf("章节(%d): %s, URL: %s, 状态(0)更新失败", chapterInfo.ID, chapterName, fullChapterURL)
 			}
 		}

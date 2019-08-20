@@ -46,3 +46,8 @@ func (t *Chapters) AddData(data ...interface{}) (result sql.Result, err error) {
 func (t *Chapters) GetData(where interface{}) (result gdb.Result, err error) {
 	return t.DB.Table(config.TbNameChapters).Where(where).Select()
 }
+
+// UpdateData 获取一组数据
+func (t *Chapters) UpdateData(data, where interface{}) (result sql.Result, err error) {
+	return t.DB.Table(config.TbNameChapters).Data(data).Where(where).Update()
+}

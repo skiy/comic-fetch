@@ -46,3 +46,11 @@ func (t *Images) AddData(data ...interface{}) (result sql.Result, err error) {
 func (t *Images) GetData(where interface{}) (result gdb.Result, err error) {
 	return t.DB.Table(config.TbNameImages).Where(where).Select()
 }
+
+// AddDataBatch 批量添加一组信息
+func (t *Images) AddDataBatch(data []TbImages, batch int) (result sql.Result, err error) {
+	if batch == 0 {
+		batch = len(data)
+	}
+	return t.DB.Table(config.TbNameImages).Data(data).Batch(batch).Insert()
+}
