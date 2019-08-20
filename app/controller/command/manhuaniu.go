@@ -91,15 +91,19 @@ func (t *Manhuaniu) ToFetch() (err error) {
 
 	//log.Println(chapterURLList)
 
-	db := ldb.GetDatabase()
-
 	// 从数据库中获取已采集的章节列表
-	chapters := ([]model.TbChapters)(nil)
-	if err = db.Table(config.TbNameChapters).Structs(&chapters); err != nil {
+	chapterModel := model.NewChapters()
+	chapterRes, err := chapterModel.GetDataOne(g.Map{})
+	if err != nil {
 		if err != sql.ErrNoRows {
-			return
+			return err
 		}
 		err = nil
+	}
+
+	chapters := ([]model.TbChapters)(nil)
+	if err := chapterRes.ToStruct(chapters); err != nil {
+		return err
 	}
 
 	// 章节转Map

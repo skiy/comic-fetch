@@ -1,5 +1,11 @@
 package model
 
+import (
+	"database/sql"
+	"github.com/gogf/gf/g/database/gdb"
+	"github.com/skiy/comic-fetch/app/config"
+)
+
 // TbImages 图片表
 type TbImages struct {
 	ID        int64  `gconv:"id"`         // ID
@@ -16,4 +22,27 @@ type TbImages struct {
 
 // Images 图片
 type Images struct {
+	model
+}
+
+// NewImages Images init
+func NewImages() *Images {
+	t := &Images{}
+	t.connect()
+	return t
+}
+
+// GetDataOne 获取一条信息
+func (t *Images) GetDataOne(where interface{}) (device gdb.Record, err error) {
+	return t.DB.Table(config.TbNameImages).Where(where).One()
+}
+
+// AddData 添加一条信息
+func (t *Images) AddData(data ...interface{}) (result sql.Result, err error) {
+	return t.DB.Table(config.TbNameImages).Data(data).Insert()
+}
+
+// GetData 获取一组数据
+func (t *Images) GetData(where interface{}) (result gdb.Result, err error) {
+	return t.DB.Table(config.TbNameImages).Where(where).Select()
 }

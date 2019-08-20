@@ -261,7 +261,7 @@ func load() {
 	} else {
 		envDev := os.Getenv("ENVIRONMENT")
 		if envDev == "dev" || envDev == "develop" {
-			lcfg.SetCfgName("config.env.toml")
+			lcfg.SetCfgName("config.dev.toml")
 		}
 	}
 

@@ -1,5 +1,11 @@
 package model
 
+import (
+	"database/sql"
+	"github.com/gogf/gf/g/database/gdb"
+	"github.com/skiy/comic-fetch/app/config"
+)
+
 // TbChapters 章节表
 type TbChapters struct {
 	ID        int64  `gconv:"id"`         // ID
@@ -16,4 +22,27 @@ type TbChapters struct {
 
 // Chapters 漫画章节
 type Chapters struct {
+	model
+}
+
+// NewChapters Chapters init
+func NewChapters() *Chapters {
+	t := &Chapters{}
+	t.connect()
+	return t
+}
+
+// GetDataOne 获取一条信息
+func (t *Chapters) GetDataOne(where interface{}) (device gdb.Record, err error) {
+	return t.DB.Table(config.TbNameChapters).Where(where).One()
+}
+
+// AddData 添加一条信息
+func (t *Chapters) AddData(data ...interface{}) (result sql.Result, err error) {
+	return t.DB.Table(config.TbNameChapters).Data(data).Insert()
+}
+
+// GetData 获取一组数据
+func (t *Chapters) GetData(where interface{}) (result gdb.Result, err error) {
+	return t.DB.Table(config.TbNameChapters).Where(where).Select()
 }
