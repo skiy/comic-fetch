@@ -13,6 +13,7 @@ import (
 	"github.com/skiy/comic-fetch/app/library/lfetch"
 	"github.com/skiy/comic-fetch/app/library/lfilepath"
 	"github.com/skiy/comic-fetch/app/library/llog"
+	"github.com/skiy/comic-fetch/app/library/lnotify"
 	"github.com/skiy/comic-fetch/app/library/lstrings"
 	"github.com/skiy/comic-fetch/app/model"
 	"io"
@@ -25,9 +26,10 @@ import (
 
 // Mh1234 漫画1234
 type Mh1234 struct {
-	Books  *model.TbBooks
-	WebURL string
-	ResURL string
+	Books    *model.TbBooks
+	WebURL   string
+	ResURL   string
+	Notified bool
 }
 
 // AddBook Add new comic
@@ -48,6 +50,23 @@ func (t *Mh1234) AddBook(siteURL string) (err error) {
 	bookRes, err := bookModel.AddData(t.Books)
 	if err != nil {
 		return err
+	}
+
+	cfg := lcfg.GetCfg()
+	notifyType := cfg.GetInt("notify.type")
+	notifyNewBook := cfg.GetBool("notify.book")
+
+	if notifyNewBook {
+		notify := lnotify.NewNotifyMessage(1)
+
+		// 钉钉通知
+		if notifyType == 1 {
+			if err := notify.Dingtalk(t.Books.Name, t.Books.OriginWeb, t.Books.OriginImageURL, t.Books.OriginURL); err != nil {
+				llog.Log.Warningf("新增漫画通知失败: %v", err)
+			}
+
+			t.Notified = true
+		}
 	}
 
 	t.Books.ID, _ = bookRes.LastInsertId()
@@ -84,22 +103,27 @@ func (t *Mh1234) ToFetch() (err error) {
 	chapterModel := model.NewChapters()
 	chapterRes, err := chapterModel.GetData(g.Map{})
 	if err != nil {
+		fmt.Println(1, err)
 		if err != sql.ErrNoRows {
+			fmt.Println(2, err)
 			return err
 		}
 		err = nil
 	}
 
 	var chapters []model.TbChapters
-	if err := chapterRes.ToStructs(&chapters); err != nil {
-		return err
-	}
-
-	// 章节转Map
 	chapterStatusMap := map[int]model.TbChapters{}
-	for _, chapter := range chapters {
-		//log.Println(chapter)
-		chapterStatusMap[chapter.OriginID] = chapter
+
+	if chapterRes != nil {
+		if err := chapterRes.ToStructs(&chapters); err != nil {
+			return err
+		}
+
+		// 章节转Map
+		for _, chapter := range chapters {
+			//log.Println(chapter)
+			chapterStatusMap[chapter.OriginID] = chapter
+		}
 	}
 
 	orderID := len(chapters)
@@ -157,6 +181,13 @@ func (t *Mh1234) ToFetch() (err error) {
 		preg2 := `^([0-9]*)`
 		re2 := regexp.MustCompile(preg2)
 		episodeIDs := re2.FindStringSubmatch(chapterName)
+		fmt.Println("episodeIDs:1 ", episodeIDs, len(episodeIDs))
+		if len(episodeIDs) < 2 || episodeIDs[1] == "" {
+			preg2 := `第([0-9]*)[话章]`
+			re2 := regexp.MustCompile(preg2)
+			episodeIDs = re2.FindStringSubmatch(chapterName)
+		}
+		fmt.Println("episodeIDs:2 ", episodeIDs, len(episodeIDs))
 
 		if len(episodeIDs) > 1 {
 			episodeID, _ = strconv.Atoi(strings.Trim(episodeIDs[1], ""))
@@ -184,6 +215,26 @@ func (t *Mh1234) ToFetch() (err error) {
 			} else {
 				orderID++
 				chapterInfo.ID, _ = res.LastInsertId()
+
+				// 未通知过
+				if !t.Notified {
+					cfg := lcfg.GetCfg()
+					notifyType := cfg.GetInt("notify.type")
+					notifyNewBook := cfg.GetBool("notify.book")
+
+					if notifyNewBook {
+						notify := lnotify.NewNotifyMessage(2)
+
+						// 钉钉通知
+						if notifyType == 1 {
+							if err := notify.Dingtalk(t.Books.Name, chapter.Title, t.Books.OriginImageURL, chapter.OriginURL); err != nil {
+								llog.Log.Warningf("更新漫画通知失败: %v", err)
+							}
+
+							t.Notified = true
+						}
+					}
+				}
 			}
 		}
 
@@ -374,7 +425,9 @@ func (t *Mh1234) ToFetchChapter(chapterURL string) (chapterName string, imageURL
 		return
 	}
 
-	scriptNameText := doc.Find("script").Eq(23).Text()
+	scriptNodes := doc.Find("script")
+	scriptCount := scriptNodes.Length()
+	scriptNameText := scriptNodes.Eq(scriptCount - 1).Text()
 
 	pregInfo := `SinMH\.initChapter\(([^;]*)\)`
 	re3, err := regexp.Compile(pregInfo)

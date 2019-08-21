@@ -30,17 +30,32 @@
         port = "33001"
 
 # 通知
-[notice]
-    # 0不使用, 1钉钉通知
+[notify]
+    # 0.不使用, 1.钉钉通知
     type = 0
     # 新书通知
     book = true
     # 新章节通知
     chapter = true
-    # 接收人,如果是钉钉则用手机号, 若是全部则留空
-    receiver = ""
-    # ding_talk_token
-    ding_talk_token = ""
+
+    ## 钉钉通知
+    [notify.dingtalk]
+        # 通知类型 1.钉钉群机器人, 2.钉钉微应用[工作通知]
+        type = 1
+        # 接收人,如果是钉钉则用手机号, 若是全部则留空
+        receiver = ""
+
+        ## 微应用
+        # AppKey
+        app_key = ""
+        # AppSecret
+        app_secret = ""
+        # AgentId
+        agent_id = ""
+
+        ## 群机器人
+        # 机器人 access_token
+        robot_access_token = ""
 
 # 图片配置
 [image]
