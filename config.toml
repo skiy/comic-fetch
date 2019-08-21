@@ -40,12 +40,12 @@
     # 接收人,如果是钉钉则用手机号, 若是全部则留空
     receiver = ""
     # ding_talk_token
-    ding_talk_token = "8eaeec8ea1c97b646e85c89e884ff1cae5e5302991088f4a8d876268ce1bd59d"
+    ding_talk_token = ""
 
 # 图片配置
 [image]
     # 是否图片本地化
-    local = true
+    local = false
     # 图片保存路径
     path = "upload/images"
     # 图片名方式 md5 / normal
