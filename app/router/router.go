@@ -3,6 +3,7 @@ package router
 import (
 	"github.com/gogf/gf/g"
 	"github.com/skiy/comic-fetch/app/controller/web"
+	"github.com/skiy/comic-fetch/app/controller/web/api"
 )
 
 func init() {
@@ -15,6 +16,11 @@ func init() {
 	//s.AddStaticPath("/", "home/index.html")
 	//s.AddStaticPath("/static", "home/static")
 
-	homeController := web.NewHomeController()
-	s.BindHandler("/abc", homeController.Index)
+	webHome := web.NewHomeController()
+	s.BindHandler("/", webHome.Index)
+
+	apiGroup := s.Group("/api")
+
+	apiComic := api.NewComic()
+	apiGroup.GET("/comics", apiComic.List)
 }
