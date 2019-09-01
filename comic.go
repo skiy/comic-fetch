@@ -248,7 +248,7 @@ func cliStart() {
 
 // checkConnectDB 检测数据库连接是否正常
 func checkConnectDB() (err error) {
-	if err = ldb.GetDatabase().PingMaster(); err != nil {
+	if err = ldb.GetDB().PingMaster(); err != nil {
 		return fmt.Errorf("%s(Database)", err.Error())
 	}
 	return err

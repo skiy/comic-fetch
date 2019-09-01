@@ -5,8 +5,8 @@ import (
 	"github.com/gogf/gf/g/database/gdb"
 )
 
-// GetDatabase GetDatabase
-func GetDatabase() (db gdb.DB) {
-	db = g.Database()
+// GetDB GetDB
+func GetDB() (db gdb.DB) {
+	db = g.DB()
 	return db
 }

@@ -21,6 +21,7 @@ func init() {
 
 	apiGroup := s.Group("/api")
 
-	apiComic := api.NewComic()
-	apiGroup.GET("/comics", apiComic.List)
+	apiBooks := api.NewComic()
+	apiGroup.GET("/books", apiBooks.List)
+	apiGroup.GET("/books/:id", apiBooks.List)
 }
