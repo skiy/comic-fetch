@@ -126,7 +126,7 @@ func (t *Mh1234) ToFetch() (err error) {
 		}
 	}
 
-	orderID := len(chapters)
+	orderID := len(chapters) + 1
 	cfg := lcfg.GetCfg()
 
 	imageLocal := cfg.GetBool("image.local")
@@ -242,6 +242,7 @@ func (t *Mh1234) ToFetch() (err error) {
 
 		var imageDataArr []model.TbImages
 		for index, imageOriginURL := range imageURLList {
+			imageOrderID := index + 1
 			fullImageOriginURL := t.ResURL + imageOriginURL
 
 			log.Debugf("[IMAGE URL] %s", fullImageOriginURL)
@@ -255,7 +256,7 @@ func (t *Mh1234) ToFetch() (err error) {
 				if res, err := lfetch.GetResponse(fullImageOriginURL, fullChapterURL); err != nil {
 					log.Warningf("远程获取图片本地化失败: %v", err)
 				} else {
-					fileName := fmt.Sprintf("%d-%d-%d", t.Books.ID, chapterInfo.ID, index)
+					fileName := fmt.Sprintf("%d-%d-%d", t.Books.ID, chapterInfo.ID, imageOrderID)
 					if strings.EqualFold(nametype, "md5") {
 						if name, err := gmd5.Encrypt(fileName); err != nil {
 							log.Warningf("图片本地化文件名 MD5 加密失败: %v", err)
@@ -297,7 +298,7 @@ func (t *Mh1234) ToFetch() (err error) {
 				imageURL,
 				fullImageOriginURL,
 				imageSize,
-				index,
+				imageOrderID,
 				isRemote,
 				timestamp,
 			})

@@ -21,7 +21,19 @@ func init() {
 
 	apiGroup := s.Group("/api")
 
-	apiBooks := api.NewComic()
+	apiBooks := api.NewBook()
 	apiGroup.GET("/books", apiBooks.List)
 	apiGroup.GET("/books/:id", apiBooks.List)
+
+	apiChapters := api.NewChapter()
+	apiGroup.GET("/books/:book_id/chapters", apiChapters.List)
+	apiGroup.GET("/books/:book_id/chapters/:id", apiChapters.List)
+	apiGroup.GET("/books/:book_id/parts", apiChapters.List)
+	apiGroup.GET("/books/:book_id/parts/:chapter_num", apiChapters.List)
+
+	apiComics := api.NewComic()
+	apiGroup.GET("/books/:book_id/chapters/:chapter_id/comics", apiComics.List)
+	apiGroup.GET("/books/:book_id/chapters/:chapter_id/comics/:id", apiComics.List)
+	apiGroup.GET("/books/:book_id/chapters/:chapter_id/parts", apiComics.List)
+	apiGroup.GET("/books/:book_id/chapters/:chapter_id/parts/:comic_num", apiComics.List)
 }

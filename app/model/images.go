@@ -8,16 +8,16 @@ import (
 
 // TbImages 图片表
 type TbImages struct {
-	ID        int64  `gconv:"id"`         // ID
-	BookID    int64  `gconv:"book_id"`    // 漫画 ID
-	ChapterID int64  `gconv:"chapter_id"` // 章节 ID
-	EpisodeID int    `gconv:"episode_id"` // 话序 ID
-	ImageURL  string `gconv:"image_url"`  // 图片地址
-	OriginURL string `gconv:"origin_url"` // 漫画图片采集地址
-	Size      int64  `gconv:"size"`       // 文件大小
-	OrderID   int    `gconv:"order_id"`   // 图片排序
-	IsRemote  int    `gconv:"is_remote"`  // 是否远程图片
-	CreatedAt int64  `gconv:"created_at"` // 创建时间
+	ID        int64  `json:"id" gconv:"id"`                 // ID
+	BookID    int64  `json:"book_id" gconv:"book_id"`       // 漫画 ID
+	ChapterID int64  `json:"chapter_id" gconv:"chapter_id"` // 章节 ID
+	EpisodeID int    `json:"episode_id" gconv:"episode_id"` // 话序 ID
+	ImageURL  string `json:"image_url" gconv:"image_url"`   // 图片地址
+	OriginURL string `json:"origin_url" gconv:"origin_url"` // 漫画图片采集地址
+	Size      int64  `json:"size" gconv:"size"`             // 文件大小
+	OrderID   int    `json:"order_id" gconv:"order_id"`     // 图片排序
+	IsRemote  int    `json:"is_remote" gconv:"is_remote"`   // 是否远程图片
+	CreatedAt int64  `json:"created_at" gconv:"created_at"` // 创建时间
 }
 
 // Images 图片

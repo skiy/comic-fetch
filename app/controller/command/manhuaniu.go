@@ -134,7 +134,7 @@ func (t *Manhuaniu) ToFetch() (err error) {
 		}
 	}
 
-	orderID := len(chapters)
+	orderID := len(chapters) + 1
 	cfg := lcfg.GetCfg()
 
 	imageLocal := cfg.GetBool("image.local")

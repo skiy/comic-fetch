@@ -8,7 +8,7 @@ type core struct {
 }
 
 // sort 构造排序
-func (t *core) sort(str string) string {
+func (t *core) sort(str string, filter map[string]bool) string {
 	arr := strings.Split(str, ",")
 	var sortArr []string
 	var order string
@@ -22,6 +22,11 @@ func (t *core) sort(str string) string {
 			} else {
 				order = "asc"
 				field = s1
+			}
+
+			// 过滤字段
+			if f, ok := filter[field]; ok && f {
+				continue
 			}
 
 			if field != "" {
