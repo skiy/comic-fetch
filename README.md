@@ -2,10 +2,10 @@
 [![License](https://img.shields.io/github/license/skiy/comic-fetch)](https://github.com/skiy/comic-fetch)
 
 ### 开发进度
-- command 帮助中心 [完成]
+- [command 帮助中心](https://github.com/skiy/comic-fetch/wiki/%E5%B8%AE%E5%8A%A9%E4%B8%AD%E5%BF%83) [完成]
+- [API 接口](https://github.com/skiy/comic-fetch/wiki/API%E6%8E%A5%E5%8F%A3) [正在开发]
 - 公共规则 [待优化]
 - WEB 网站
-- API接口 [正在开发] [查看]()
 
 #### 采集
 #### 可视化
@@ -44,9 +44,9 @@ COPYRIGHT:
 ```
 
 ### 感谢
-- [https://github.com/gogf/gf]()
-- [https://github.com/PuerkitoBio/goquery]()
-- [https://github.com/urfave/cli]()
+- [https://github.com/gogf/gf](https://github.com/gogf/gf)
+- [https://github.com/PuerkitoBio/goquery](https://github.com/PuerkitoBio/goquery)
+- [https://github.com/urfave/cli](https://github.com/urfave/cli)
 
 ### 作者
 Author: Skiychan   
@@ -54,5 +54,4 @@ Email : dev@skiy.net
 Link  : https://www.skiy.net    
 
 ### License
-
 This project is licensed under the [MIT license](https://github.com/totoval/totoval/blob/master/LICENSE).
