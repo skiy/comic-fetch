@@ -76,3 +76,43 @@ func (t *Book) List(r *ghttp.Request) {
 		r.Response.Status = 500
 	}
 }
+
+func (t *Book) Search(r *ghttp.Request) {
+	var response lfunc.Response
+	response.Code = 1
+	response.Message = "操作失败"
+
+	// 漫画 ID
+	name := r.GetString("name")
+	if name == "" {
+		response.Message = "漫画名不存在"
+		if err := r.Response.WriteJson(response); err != nil {
+			r.Response.Status = 500
+		}
+		return
+	}
+
+	like := "%" + name + "%"
+
+	books := ([]model.TbBooks)(nil)
+	resp, err := ldb.GetDB().Table(config.TbNameBooks).Where("name like ?", like).OrderBy("created_at desc").Select()
+
+	if err != nil && err != sql.ErrNoRows {
+		llog.Log.Debug(err.Error())
+		response.Message = "漫画搜索失败[Book.Search]"
+	} else {
+		if err != sql.ErrNoRows {
+			if err := resp.ToStructs(&books); err != nil {
+				response.Message = err.Error()
+			}
+		}
+
+		response.Code = 0
+		response.Message = "操作成功"
+		response.Data = books
+	}
+
+	if err := r.Response.WriteJson(response); err != nil {
+		r.Response.Status = 500
+	}
+}

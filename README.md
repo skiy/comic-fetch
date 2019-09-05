@@ -1,15 +1,11 @@
-# 漫画采集
+## 漫画采集
+[![License](https://img.shields.io/github/license/skiy/comic-fetch)](https://github.com/skiy/comic-fetch)
 
-## 开发进度
+### 开发进度
+- command 帮助中心 [完成]
 - 公共规则 [待优化]
-> 很多网站都是用同一套 CMS 开发的，所以很多站点的规则都是一样的。
-- command **帮助中心** [完成]
-- api **API接口**[正在开发]
-> 1. 漫画列表
-> 2. 获取漫画信息 
-- web **WEB 网站**
->> 主页
->>> 静态资源、
+- WEB 网站
+- API接口 [正在开发] [查看]()
 
 #### 采集
 #### 可视化

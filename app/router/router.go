@@ -36,4 +36,6 @@ func init() {
 	apiGroup.GET("/books/:book_id/chapters/:chapter_id/comics/:id", apiComics.List)
 	apiGroup.GET("/books/:book_id/chapters/:chapter_id/parts", apiComics.List)
 	apiGroup.GET("/books/:book_id/chapters/:chapter_id/parts/:comic_num", apiComics.List)
+
+	apiGroup.GET("/search/:name", apiBooks.Search)
 }

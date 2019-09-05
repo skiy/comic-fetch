@@ -4,6 +4,8 @@ github.com/andybalholm/cascadia v1.0.0 h1:hOCXnnZ5A+3eVDX8pvgl4kofXv2ELss0bKcqRy
 github.com/andybalholm/cascadia v1.0.0/go.mod h1:GsXiBklL0woXo1j/WYWtSYYC4ouU9PqHO0sqidkEA4Y=
 github.com/gogf/gf v1.8.3 h1:+jZ8+2KkocsalkbLnxubglaJXvDvUIkrdYWRm9vkwiY=
 github.com/gogf/gf v1.8.3/go.mod h1:qJRcq0s3RskjJIZKsSHjZkpxw91rd0EAh+4CUbawbXQ=
+github.com/urfave/cli v1.19.2-0.20190806201727-b62605953717 h1:gwVSCE49ALtmz/U44pbK7lfhwDMrvU0ylrSeWF1QIO8=
+github.com/urfave/cli v1.19.2-0.20190806201727-b62605953717/go.mod h1:70zkFmudgCuE/ngEzBv17Jvp/497gISqfk5gWijbERA=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/net v0.0.0-20180218175443-cbe0f9307d01/go.mod h1:mL1N/T3taQHkDXs73rZJwtUhF3w3ftmwwsq0BUmARs4=
 golang.org/x/net v0.0.0-20181114220301-adae6a3d119a/go.mod h1:mL1N/T3taQHkDXs73rZJwtUhF3w3ftmwwsq0BUmARs4=
