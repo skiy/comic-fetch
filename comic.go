@@ -6,10 +6,11 @@ import (
 	"github.com/gogf/gf/g/os/gcfg"
 	"github.com/gogf/gf/g/os/glog"
 	"github.com/skiy/comic-fetch/app/config"
-	"github.com/skiy/comic-fetch/app/controller"
 	"github.com/skiy/comic-fetch/app/library/lcfg"
 	"github.com/skiy/comic-fetch/app/library/ldb"
 	"github.com/skiy/comic-fetch/app/library/llog"
+	command2 "github.com/skiy/comic-fetch/app/service/command"
+	"github.com/skiy/comic-fetch/app/service/web"
 	"gopkg.in/urfave/cli.v2"
 	"os"
 	"runtime"
@@ -157,7 +158,7 @@ func main() {
 							}
 
 							if _, ok := config.WebURL[site]; ok {
-								cliApp := controller.NewCommand()
+								cliApp := command2.NewCommand()
 
 								if err := cliApp.Add(site, id); err != nil {
 									log.Fatalf("添加新漫画失败: %s", err.Error())
@@ -182,7 +183,7 @@ func main() {
 							site := c.String("site")
 							id := c.Int("id")
 
-							cliApp := controller.NewCommand()
+							cliApp := command2.NewCommand()
 							where := g.Map{
 								"origin_flag": site,
 							}
@@ -220,7 +221,7 @@ func webStart() {
 		log.Fatalf("数据库连接失败: %s", err.Error())
 	}
 
-	app := controller.NewWeb()
+	app := web.NewWeb()
 	app.Port = cmd.port
 
 	// 启动
@@ -238,7 +239,7 @@ func cliStart() {
 		log.Fatalf("数据库连接失败: %s", err.Error())
 	}
 
-	app := controller.NewCommand()
+	app := command2.NewCommand()
 
 	// 启动
 	if err := app.Update(g.Map{}); err != nil {

@@ -2,6 +2,7 @@ package api
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/gogf/gf/g"
 	"github.com/gogf/gf/g/net/ghttp"
 	"github.com/skiy/comic-fetch/app/config"
@@ -9,6 +10,7 @@ import (
 	"github.com/skiy/comic-fetch/app/library/lfunc"
 	"github.com/skiy/comic-fetch/app/library/llog"
 	"github.com/skiy/comic-fetch/app/model"
+	"github.com/skiy/comic-fetch/app/service/command"
 )
 
 // Book Book
@@ -115,4 +117,39 @@ func (t *Book) Search(r *ghttp.Request) {
 	if err := r.Response.WriteJson(response); err != nil {
 		r.Response.Status = 500
 	}
+}
+
+func (t *Book) Add(r *ghttp.Request) {
+	var response lfunc.Response
+	response.Code = 1
+	response.Message = "操作失败"
+
+	site := r.GetPostString("site")
+	id := r.GetPostInt("id")
+
+	if id == 0 {
+		response.Message = fmt.Sprintf("漫画 (%s) 参数 id 缺失", site)
+		if err := r.Response.WriteJson(response); err != nil {
+			r.Response.Status = 500
+		}
+		return
+	}
+
+	if _, ok := config.WebURL[site]; ok {
+		cliApp := command.NewCommand()
+
+		if err := cliApp.Add(site, id); err != nil {
+			response.Message = fmt.Sprintf("添加新漫画失败: %s", err.Error())
+		} else {
+			response.Code = 0
+			response.Message = "添加新漫画成功"
+		}
+	} else {
+		response.Message = fmt.Sprintf("不支持此网站 (%v) 添加新漫画", site)
+	}
+
+	if err := r.Response.WriteJson(response); err != nil {
+		r.Response.Status = 500
+	}
+	return
 }
