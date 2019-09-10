@@ -5,5 +5,5 @@ go 1.13
 require (
 	github.com/PuerkitoBio/goquery v1.5.0
 	github.com/gogf/gf v1.8.4-0.20190910123823-69684f50239d
-	gopkg.in/urfave/cli.v2 v2.0.0-20190806201727-b62605953717 // indirect
+	gopkg.in/urfave/cli.v2 v2.0.0-20190806201727-b62605953717
 )
