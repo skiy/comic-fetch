@@ -10,6 +10,7 @@ import (
 	"github.com/gogf/gf/os/gfile"
 	"github.com/skiy/comic-fetch/app/config"
 	"github.com/skiy/comic-fetch/app/library/lcfg"
+	"github.com/skiy/comic-fetch/app/library/ldb"
 	"github.com/skiy/comic-fetch/app/library/lfetch"
 	"github.com/skiy/comic-fetch/app/library/lfilepath"
 	"github.com/skiy/comic-fetch/app/library/llog"
@@ -100,12 +101,9 @@ func (t *Mh1234) ToFetch() (err error) {
 	}
 
 	// 从数据库中获取已采集的章节列表
-	chapterModel := model.NewChapters()
-	chapterRes, err := chapterModel.GetData(g.Map{})
+	chapterRes, err := ldb.GetDB().Table(config.TbNameChapters).Where(g.Map{"book_id": t.Books.ID}).Select()
 	if err != nil {
-		fmt.Println(1, err)
 		if err != sql.ErrNoRows {
-			fmt.Println(2, err)
 			return err
 		}
 		err = nil
@@ -119,7 +117,7 @@ func (t *Mh1234) ToFetch() (err error) {
 			return err
 		}
 
-		// 章节转Map
+		// 章节转 Map
 		for _, chapter := range chapters {
 			//log.Println(chapter)
 			chapterStatusMap[chapter.OriginID] = chapter
@@ -164,7 +162,7 @@ func (t *Mh1234) ToFetch() (err error) {
 		}
 
 		fullChapterURL := t.WebURL + chapterURL
-		log.Infof("[URL] %s", fullChapterURL)
+		log.Debugf("\n[URL] %s", fullChapterURL)
 
 		chapterName, imageURLList, err := t.ToFetchChapter(fullChapterURL)
 		if err != nil {
@@ -181,19 +179,17 @@ func (t *Mh1234) ToFetch() (err error) {
 		preg2 := `^([0-9]*)`
 		re2 := regexp.MustCompile(preg2)
 		episodeIDs := re2.FindStringSubmatch(chapterName)
-		fmt.Println("episodeIDs:1 ", episodeIDs, len(episodeIDs))
 		if len(episodeIDs) < 2 || episodeIDs[1] == "" {
 			preg2 := `第([0-9]*)[话章]`
 			re2 := regexp.MustCompile(preg2)
 			episodeIDs = re2.FindStringSubmatch(chapterName)
 		}
-		fmt.Println("episodeIDs:2 ", episodeIDs, len(episodeIDs))
 
 		if len(episodeIDs) > 1 {
 			episodeID, _ = strconv.Atoi(strings.Trim(episodeIDs[1], ""))
 		}
 
-		log.Infof("[Title] %s, [Image Count] %d", chapterName, len(imageURLList))
+		log.Debugf("[Title] %s, [Image Count] %d", chapterName, len(imageURLList))
 
 		status := 1 // 默认失败状态
 		timestamp := time.Now().Unix()
@@ -210,7 +206,7 @@ func (t *Mh1234) ToFetch() (err error) {
 			chapter.CreatedAt = timestamp
 			chapter.UpdatedAt = timestamp
 
-			if res, err := chapterModel.AddData(chapter); err != nil {
+			if res, err := ldb.GetDB().Table(config.TbNameChapters).Data(chapter).Insert(); err != nil {
 				log.Warningf("新章节: %s, URL: %s, 保存失败", chapterName, fullChapterURL)
 			} else {
 				orderID++
@@ -228,7 +224,7 @@ func (t *Mh1234) ToFetch() (err error) {
 						// 钉钉通知
 						if notifyType == 1 {
 							if err := notify.Dingtalk(t.Books.Name, chapter.Title, t.Books.OriginImageURL, chapter.OriginURL); err != nil {
-								llog.Log.Warningf("更新漫画通知失败: %v", err)
+								log.Warningf("更新漫画通知失败: %v", err)
 							}
 
 							t.Notified = true
@@ -314,7 +310,7 @@ func (t *Mh1234) ToFetch() (err error) {
 				"updated_at": time.Now().Unix(),
 			}
 
-			if _, err := chapterModel.UpdateData(chapterData, g.Map{"id": chapterInfo.ID}); err != nil {
+			if _, err := ldb.GetDB().Table(config.TbNameChapters).Data(chapterData).Where(g.Map{"id": chapterInfo.ID}).Update(); err != nil {
 				log.Warningf("章节(%d): %s, URL: %s, 状态(0)更新失败", chapterInfo.ID, chapterName, fullChapterURL)
 			}
 		}

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/net/ghttp"
+	"github.com/gogf/gf/util/gvalid"
 	"github.com/skiy/comic-fetch/app/config"
 	"github.com/skiy/comic-fetch/app/library/ldb"
 	"github.com/skiy/comic-fetch/app/library/lfunc"
@@ -29,6 +30,8 @@ func NewBook() *Book {
 // offset=10&limit=5 分页
 // /api/books[/:id]
 func (t *Book) List(r *ghttp.Request) {
+	r.Response.Status = 500
+
 	var response lfunc.Response
 	response.Code = 1
 	response.Message = "操作失败"
@@ -60,12 +63,12 @@ func (t *Book) List(r *ghttp.Request) {
 	books := ([]model.TbBooks)(nil)
 	resp, err := ldb.GetDB().Table(config.TbNameBooks).Where(where).OrderBy(sort).Offset(offset).Limit(limit).Select()
 	if err != nil && err != sql.ErrNoRows {
-		llog.Log.Debug(err.Error())
+		llog.Log.Warning(err.Error())
 		response.Message = "漫画列表获取失败[Book.List]"
 	} else {
 		if err != sql.ErrNoRows {
 			if err := resp.ToStructs(&books); err != nil {
-				response.Message = err.Error()
+				llog.Log.Warning(err.Error())
 			}
 		}
 
@@ -74,23 +77,22 @@ func (t *Book) List(r *ghttp.Request) {
 		response.Data = books
 	}
 
-	if err := r.Response.WriteJson(response); err != nil {
-		r.Response.Status = 500
-	}
+	r.Response.WriteJson(response)
 }
 
+// Search 搜索
 func (t *Book) Search(r *ghttp.Request) {
+	r.Response.Status = 500
+
 	var response lfunc.Response
 	response.Code = 1
 	response.Message = "操作失败"
 
-	// 漫画 ID
+	// 漫画 名
 	name := r.GetString("name")
 	if name == "" {
 		response.Message = "漫画名不存在"
-		if err := r.Response.WriteJson(response); err != nil {
-			r.Response.Status = 500
-		}
+		r.Response.WriteJson(response)
 		return
 	}
 
@@ -105,51 +107,98 @@ func (t *Book) Search(r *ghttp.Request) {
 	} else {
 		if err != sql.ErrNoRows {
 			if err := resp.ToStructs(&books); err != nil {
-				response.Message = err.Error()
+				llog.Log.Warning(err.Error())
 			}
 		}
 
+		r.Response.Status = 200
 		response.Code = 0
 		response.Message = "操作成功"
 		response.Data = books
 	}
 
-	if err := r.Response.WriteJson(response); err != nil {
-		r.Response.Status = 500
-	}
+	r.Response.WriteJson(response)
 }
 
+// Add 添加新漫画
 func (t *Book) Add(r *ghttp.Request) {
+	r.Response.Status = 500
+
 	var response lfunc.Response
 	response.Code = 1
 	response.Message = "操作失败"
 
-	site := r.GetPostString("site")
-	id := r.GetPostInt("id")
+	type form struct {
+		ID   int    `params:"id" gvalid:"id@required"`
+		Site string `params:"site" gvalid:"site@required"`
+	}
 
-	if id == 0 {
-		response.Message = fmt.Sprintf("漫画 (%s) 参数 id 缺失", site)
-		if err := r.Response.WriteJson(response); err != nil {
-			r.Response.Status = 500
-		}
+	formData := new(form)
+	r.GetToStruct(formData)
+
+	if err := gvalid.CheckStruct(formData, nil); err != nil {
+		response.Message = err.FirstString()
+		r.Response.WriteJson(response)
 		return
 	}
 
-	if _, ok := config.WebURL[site]; ok {
+	if _, ok := config.WebURL[formData.Site]; ok {
 		cliApp := command.NewCommand()
 
-		if err := cliApp.Add(site, id); err != nil {
+		if err := cliApp.Add(formData.Site, formData.ID); err != nil {
 			response.Message = fmt.Sprintf("添加新漫画失败: %s", err.Error())
 		} else {
+			r.Response.Status = 200
 			response.Code = 0
 			response.Message = "添加新漫画成功"
 		}
 	} else {
-		response.Message = fmt.Sprintf("不支持此网站 (%v) 添加新漫画", site)
+		response.Message = fmt.Sprintf("不支持此网站 (%v) 添加新漫画", formData.Site)
 	}
 
-	if err := r.Response.WriteJson(response); err != nil {
-		r.Response.Status = 500
+	r.Response.WriteJson(response)
+}
+
+// Update 更新漫画信息
+func (t *Book) Update(r *ghttp.Request) {
+	var response lfunc.Response
+	response.Code = 1
+	response.Message = "操作失败"
+	r.Response.Status = 500
+
+	type form struct {
+		ID     int `params:"id" gvalid:"id@required"`
+		Status int `params:"status" gvalid:"status@in:0,1,2"`
 	}
-	return
+
+	formData := new(form)
+	r.GetToStruct(formData)
+
+	if err := r.GetToStruct(formData); err != nil {
+		response.Message = err.Error()
+		r.Response.WriteJson(response)
+		return
+	}
+
+	if err := gvalid.CheckStruct(formData, nil); err != nil {
+		response.Message = err.FirstString()
+		r.Response.WriteJson(response)
+		return
+	}
+
+	data := g.Map{
+		"status": formData.Status,
+	}
+
+	_, err := ldb.GetDB().Table(config.TbNameBooks).Where(g.Map{"id": formData.ID}).Data(data).Update()
+	if err != nil {
+		llog.Log.Warningf(err.Error())
+		response.Message = "漫画更新失败[Book.Update]"
+	} else {
+		r.Response.Status = 200
+		response.Code = 0
+		response.Message = "操作成功"
+	}
+
+	r.Response.WriteJson(response)
 }

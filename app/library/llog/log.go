@@ -37,7 +37,7 @@ func InitLog() *glog.Logger {
 func ReadLog() *glog.Logger {
 	cfg := lcfg.GetCfg()
 
-	//日志等级
+	// 日志等级
 	if logLevel := cfg.GetString("log.level"); logLevel != "" {
 
 		if l, ok := level[logLevel]; ok {
@@ -45,7 +45,7 @@ func ReadLog() *glog.Logger {
 		}
 	}
 
-	//日志路径
+	// 日志路径
 	if logPath := cfg.GetString("log.path"); logPath != "" {
 		if err := Log.SetPath(logPath); err != nil {
 			Log.Warning(err.Error())

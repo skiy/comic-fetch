@@ -25,6 +25,7 @@ func init() {
 	apiGroup.GET("/books", apiBooks.List)
 	apiGroup.GET("/books/:id", apiBooks.List)
 	apiGroup.POST("/books", apiBooks.Add)
+	apiGroup.PUT("/books", apiBooks.Update)
 
 	apiChapters := api.NewChapter()
 	apiGroup.GET("/books/:book_id/chapters", apiChapters.List)

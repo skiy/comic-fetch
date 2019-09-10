@@ -52,7 +52,7 @@ func (t *Chapter) List(r *ghttp.Request) {
 		where["id"] = i
 	} else {
 		// 漫画章节序号
-		if num := r.GetInt("comic_num"); num != 0 {
+		if num := r.GetInt("chapter_num"); num != 0 {
 			where["order_id"] = num
 		}
 	}

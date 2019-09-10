@@ -38,6 +38,13 @@ func (t *Web) Start() (err error) {
 		s.AddSearchPath(distPath)
 	}
 
+	// 设置服务日志路径
+	if logPath := lcfg.GetCfg().GetString("log.path"); logPath != "" {
+		s.SetLogPath(logPath)
+		s.SetAccessLogEnabled(true)
+		s.SetErrorLogEnabled(true)
+	}
+
 	s.SetPort(t.Port)
 
 	// 关闭平滑重启功能
