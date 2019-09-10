@@ -2,7 +2,7 @@ package model
 
 import (
 	"database/sql"
-	"github.com/gogf/gf/g/database/gdb"
+	"github.com/gogf/gf/database/gdb"
 	"github.com/skiy/comic-fetch/app/config"
 )
 

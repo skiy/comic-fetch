@@ -3,8 +3,8 @@ package lfetch
 import (
 	"bytes"
 	"github.com/PuerkitoBio/goquery"
-	"github.com/gogf/gf/g/encoding/gcharset"
-	"github.com/gogf/gf/g/net/ghttp"
+	"github.com/gogf/gf/encoding/gcharset"
+	"github.com/gogf/gf/net/ghttp"
 	"strings"
 )
 

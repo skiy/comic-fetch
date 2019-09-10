@@ -1,6 +1,6 @@
 package web
 
-import "github.com/gogf/gf/g/net/ghttp"
+import "github.com/gogf/gf/net/ghttp"
 
 // HomeController HomeController
 type HomeController struct {

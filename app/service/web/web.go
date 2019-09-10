@@ -1,7 +1,7 @@
 package web
 
 import (
-	"github.com/gogf/gf/g"
+	"github.com/gogf/gf/frame/g"
 	"github.com/skiy/comic-fetch/app/library/lcfg"
 	"github.com/skiy/comic-fetch/app/library/llog"
 

@@ -1,7 +1,7 @@
 package router
 
 import (
-	"github.com/gogf/gf/g"
+	"github.com/gogf/gf/frame/g"
 	"github.com/skiy/comic-fetch/app/controller/web"
 	"github.com/skiy/comic-fetch/app/controller/web/api"
 )

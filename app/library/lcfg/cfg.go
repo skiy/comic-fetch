@@ -1,8 +1,8 @@
 package lcfg
 
 import (
-	"github.com/gogf/gf/g"
-	"github.com/gogf/gf/g/os/gcfg"
+	"github.com/gogf/gf/frame/g"
+	"github.com/gogf/gf/os/gcfg"
 )
 
 var cfg *gcfg.Config

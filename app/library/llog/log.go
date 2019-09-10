@@ -1,7 +1,7 @@
 package llog
 
 import (
-	"github.com/gogf/gf/g/os/glog"
+	"github.com/gogf/gf/os/glog"
 	"github.com/skiy/comic-fetch/app/library/lcfg"
 )
 
