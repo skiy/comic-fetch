@@ -9,6 +9,7 @@ import (
 	"github.com/skiy/comic-fetch/app/library/lfunc"
 	"github.com/skiy/comic-fetch/app/library/llog"
 	"github.com/skiy/comic-fetch/app/model"
+	"net/http"
 )
 
 // Comic Comic
@@ -28,6 +29,8 @@ func NewComic() *Comic {
 // /api/books/:book_id/chapters/:chapter_id/comics[/:id]
 // /api/books/:book_id/chapters/:chapter_id/parts[/:comic_num]
 func (t *Comic) List(r *ghttp.Request) {
+	r.Response.Status = http.StatusBadRequest
+
 	var response lfunc.Response
 	response.Code = 1
 	response.Message = "操作失败"
@@ -40,18 +43,14 @@ func (t *Comic) List(r *ghttp.Request) {
 	bookID := r.GetInt("book_id")
 	if bookID == 0 {
 		response.Message = "漫画 ID 不存在"
-		if err := r.Response.WriteJson(response); err != nil {
-			r.Response.Status = 500
-		}
+		r.Response.WriteJson(response)
 		return
 	}
 
 	chapterID := r.GetInt("chapter_id")
 	if chapterID == 0 {
 		response.Message = "漫画章节 ID 不存在"
-		if err := r.Response.WriteJson(response); err != nil {
-			r.Response.Status = 500
-		}
+		r.Response.WriteJson(response)
 		return
 	}
 
@@ -95,15 +94,16 @@ func (t *Comic) List(r *ghttp.Request) {
 		if err != sql.ErrNoRows {
 			if err := resp.ToStructs(&Comics); err != nil {
 				response.Message = err.Error()
+				r.Response.WriteJson(response)
+				return
 			}
 		}
+		r.Response.Status = http.StatusOK
 
 		response.Code = 0
 		response.Message = "操作成功"
 		response.Data = Comics
 	}
 
-	if err := r.Response.WriteJson(response); err != nil {
-		r.Response.Status = 500
-	}
+	r.Response.WriteJson(response)
 }

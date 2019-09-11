@@ -12,6 +12,8 @@ import (
 	"github.com/skiy/comic-fetch/app/library/llog"
 	"github.com/skiy/comic-fetch/app/model"
 	"github.com/skiy/comic-fetch/app/service/command"
+	"net/http"
+	"time"
 )
 
 // Book Book
@@ -30,7 +32,7 @@ func NewBook() *Book {
 // offset=10&limit=5 分页
 // /api/books[/:id]
 func (t *Book) List(r *ghttp.Request) {
-	r.Response.Status = 500
+	r.Response.Status = http.StatusBadRequest
 
 	var response lfunc.Response
 	response.Code = 1
@@ -82,7 +84,7 @@ func (t *Book) List(r *ghttp.Request) {
 
 // Search 搜索
 func (t *Book) Search(r *ghttp.Request) {
-	r.Response.Status = 500
+	r.Response.Status = http.StatusBadRequest
 
 	var response lfunc.Response
 	response.Code = 1
@@ -111,7 +113,7 @@ func (t *Book) Search(r *ghttp.Request) {
 			}
 		}
 
-		r.Response.Status = 200
+		r.Response.Status = http.StatusOK
 		response.Code = 0
 		response.Message = "操作成功"
 		response.Data = books
@@ -122,7 +124,7 @@ func (t *Book) Search(r *ghttp.Request) {
 
 // Add 添加新漫画
 func (t *Book) Add(r *ghttp.Request) {
-	r.Response.Status = 500
+	r.Response.Status = http.StatusBadRequest
 
 	var response lfunc.Response
 	response.Code = 1
@@ -148,7 +150,8 @@ func (t *Book) Add(r *ghttp.Request) {
 		if err := cliApp.Add(formData.Site, formData.ID); err != nil {
 			response.Message = fmt.Sprintf("添加新漫画失败: %s", err.Error())
 		} else {
-			r.Response.Status = 200
+			r.Response.Status = http.StatusCreated
+
 			response.Code = 0
 			response.Message = "添加新漫画成功"
 		}
@@ -161,13 +164,15 @@ func (t *Book) Add(r *ghttp.Request) {
 
 // Update 更新漫画信息
 func (t *Book) Update(r *ghttp.Request) {
+	r.Response.Status = http.StatusBadRequest
+
 	var response lfunc.Response
 	response.Code = 1
 	response.Message = "操作失败"
-	r.Response.Status = 500
+
+	id := r.GetInt("id")
 
 	type form struct {
-		ID     int `params:"id" gvalid:"id@required"`
 		Status int `params:"status" gvalid:"status@in:0,1,2"`
 	}
 
@@ -188,14 +193,15 @@ func (t *Book) Update(r *ghttp.Request) {
 
 	data := g.Map{
 		"status": formData.Status,
+		"updated_at": time.Now().Unix(),
 	}
 
-	_, err := ldb.GetDB().Table(config.TbNameBooks).Where(g.Map{"id": formData.ID}).Data(data).Update()
+	_, err := ldb.GetDB().Table(config.TbNameBooks).Where(g.Map{"id": id}).Data(data).Update()
 	if err != nil {
 		llog.Log.Warningf(err.Error())
 		response.Message = "漫画更新失败[Book.Update]"
 	} else {
-		r.Response.Status = 200
+		r.Response.Status = http.StatusOK
 		response.Code = 0
 		response.Message = "操作成功"
 	}

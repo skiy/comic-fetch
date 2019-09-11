@@ -4,11 +4,14 @@ import (
 	"database/sql"
 	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/net/ghttp"
+	"github.com/gogf/gf/util/gvalid"
 	"github.com/skiy/comic-fetch/app/config"
 	"github.com/skiy/comic-fetch/app/library/ldb"
 	"github.com/skiy/comic-fetch/app/library/lfunc"
 	"github.com/skiy/comic-fetch/app/library/llog"
 	"github.com/skiy/comic-fetch/app/model"
+	"net/http"
+	"time"
 )
 
 // Chapter Chapter
@@ -28,6 +31,8 @@ func NewChapter() *Chapter {
 // /api/books/:book_id/chapters[/:id]
 // /api/books/:book_id/parts[/:chapter_num]
 func (t *Chapter) List(r *ghttp.Request) {
+	r.Response.Status = http.StatusBadRequest
+
 	var response lfunc.Response
 	response.Code = 1
 	response.Message = "操作失败"
@@ -40,9 +45,7 @@ func (t *Chapter) List(r *ghttp.Request) {
 	bookID := r.GetInt("book_id")
 	if bookID == 0 {
 		response.Message = "漫画 ID 不存在"
-		if err := r.Response.WriteJson(response); err != nil {
-			r.Response.Status = 500
-		}
+		r.Response.WriteJson(response)
 		return
 	}
 	where["book_id"] = bookID
@@ -81,15 +84,75 @@ func (t *Chapter) List(r *ghttp.Request) {
 		if err != sql.ErrNoRows {
 			if err := resp.ToStructs(&chapters); err != nil {
 				response.Message = err.Error()
+				r.Response.WriteJson(response)
+				return
 			}
 		}
 
+		r.Response.Status = http.StatusOK
 		response.Code = 0
 		response.Message = "操作成功"
 		response.Data = chapters
 	}
 
-	if err := r.Response.WriteJson(response); err != nil {
-		r.Response.Status = 500
+	r.Response.WriteJson(response)
+}
+
+// Update 更新漫画章节
+func (t *Chapter) Update(r *ghttp.Request) {
+	var response lfunc.Response
+	response.Code = 1
+	response.Message = "操作失败"
+	r.Response.Status = http.StatusBadRequest
+
+	// 漫画 ID
+	bookID := r.GetInt("book_id")
+	if bookID == 0 {
+		response.Message = "漫画 ID 不存在"
+		r.Response.WriteJson(response)
+		return
 	}
+
+	id := r.GetInt("id")
+	if bookID == 0 {
+		response.Message = "漫画章节 ID 不存在"
+		r.Response.WriteJson(response)
+		return
+	}
+
+	type form struct {
+		Status int `params:"status" gvalid:"status@in:0,1,2"`
+	}
+
+	formData := new(form)
+	r.GetToStruct(formData)
+
+	if err := r.GetToStruct(formData); err != nil {
+		response.Message = err.Error()
+		r.Response.WriteJson(response)
+		return
+	}
+
+	if err := gvalid.CheckStruct(formData, nil); err != nil {
+		response.Message = err.FirstString()
+		r.Response.WriteJson(response)
+		return
+	}
+
+	data := g.Map{
+		"status": formData.Status,
+		"updated_at": time.Now().Unix(),
+	}
+
+	_, err := ldb.GetDB().Table(config.TbNameChapters).Where(g.Map{"id": id, "book_id": bookID}).Data(data).Update()
+	if err != nil {
+		llog.Log.Warningf(err.Error())
+		response.Message = "漫画更新失败[Book.Update]"
+	} else {
+		r.Response.Status = http.StatusOK
+		response.Code = 0
+		response.Message = "操作成功"
+	}
+
+	r.Response.WriteJson(response)
 }
