@@ -22,7 +22,7 @@ type TbChapters struct {
 
 // Chapters 漫画章节
 type Chapters struct {
-	model
+	base
 }
 
 // NewChapters Chapters init
@@ -33,21 +33,31 @@ func NewChapters() *Chapters {
 }
 
 // GetDataOne 获取一条信息
-func (t *Chapters) GetDataOne(where interface{}) (device gdb.Record, err error) {
-	return t.DB.Table(config.TbNameChapters).Where(where).One()
+func (t *Chapters) GetDataOne(where interface{}) (record gdb.Record, err error) {
+	return t.getDataOne(config.TbNameChapters, where)
 }
 
 // AddData 添加一条信息
 func (t *Chapters) AddData(data ...interface{}) (result sql.Result, err error) {
-	return t.DB.Table(config.TbNameChapters).Data(data).Insert()
+	return t.addData(config.TbNameChapters, data)
+}
+
+// UpdateData 更新数据
+func (t *Chapters) UpdateData(data, where interface{}) (result sql.Result, err error) {
+	return t.updateData(config.TbNameChapters, data, where)
+}
+
+// DeleteData 删除数据
+func (t *Chapters) DeleteData(where interface{}) (result sql.Result, err error) {
+	return t.deleteData(config.TbNameChapters, where)
 }
 
 // GetData 获取一组数据
 func (t *Chapters) GetData(where interface{}) (result gdb.Result, err error) {
-	return t.DB.Table(config.TbNameChapters).Where(where).Select()
+	return t.DB.Table(config.TbNameChapters).Where(where).OrderBy("id DESC").Select()
 }
 
-// UpdateData 获取一组数据
-func (t *Chapters) UpdateData(data, where interface{}) (result sql.Result, err error) {
-	return t.DB.Table(config.TbNameChapters).Data(data).Where(where).Update()
+// GetDataExt 获取一组数据 (扩展型)
+func (t *Chapters) GetDataExt(params Params) (result gdb.Result, err error) {
+	return t.getDataExt(config.TbNameChapters, params)
 }

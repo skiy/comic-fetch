@@ -7,18 +7,17 @@ import (
 	"github.com/gogf/gf/net/ghttp"
 	"github.com/gogf/gf/util/gvalid"
 	"github.com/skiy/comic-fetch/app/config"
-	"github.com/skiy/comic-fetch/app/library/ldb"
+	"github.com/skiy/comic-fetch/app/config/cerror"
 	"github.com/skiy/comic-fetch/app/library/lfunc"
 	"github.com/skiy/comic-fetch/app/library/llog"
 	"github.com/skiy/comic-fetch/app/model"
 	"github.com/skiy/comic-fetch/app/service/command"
-	"net/http"
 	"time"
 )
 
 // Book Book
 type Book struct {
-	core
+	Base
 }
 
 // NewBook Book init
@@ -32,11 +31,7 @@ func NewBook() *Book {
 // offset=10&limit=5 分页
 // /api/books[/:id]
 func (t *Book) List(r *ghttp.Request) {
-	r.Response.Status = http.StatusBadRequest
-
-	var response lfunc.Response
-	response.Code = 1
-	response.Message = "操作失败"
+	response := g.Map{}
 
 	where := g.Map{}
 	sort := "id desc"
@@ -62,73 +57,77 @@ func (t *Book) List(r *ghttp.Request) {
 		limit = l
 	}
 
-	books := ([]model.TbBooks)(nil)
-	resp, err := ldb.GetDB().Table(config.TbNameBooks).Where(where).OrderBy(sort).Offset(offset).Limit(limit).Select()
-	if err != nil && err != sql.ErrNoRows {
-		llog.Log.Warning(err.Error())
-		response.Message = "漫画列表获取失败[Book.List]"
-	} else {
-		if err != sql.ErrNoRows {
-			if err := resp.ToStructs(&books); err != nil {
-				llog.Log.Warning(err.Error())
-			}
-		}
-
-		response.Code = 0
-		response.Message = "操作成功"
-		response.Data = books
+	p := model.Params{
+		Where:  where,
+		Sort:   sort,
+		Offset: offset,
+		Limit:  limit,
 	}
 
-	r.Response.WriteJson(response)
+	books := ([]model.TbBooks)(nil)
+	m := model.NewBooks()
+	resp, err := m.GetDataExt(p)
+	if err != nil && err != sql.ErrNoRows {
+		llog.Log.Warning(err.Error())
+		r.Response.Status, response = lfunc.Response(cerror.ErrGetData, g.Map{"message": "漫画列表获取失败[Book.List]"})
+
+	} else {
+		if err != sql.ErrNoRows {
+			if resp != nil {
+				if err := resp.ToStructs(&books); err != nil {
+					llog.Log.Warning(err.Error())
+				}
+			}
+		}
+		r.Response.Status, response = lfunc.Response(cerror.ErrSuccess, g.Map{"data": books})
+	}
+
+	_ = r.Response.WriteJson(response)
 }
 
 // Search 搜索
 func (t *Book) Search(r *ghttp.Request) {
-	r.Response.Status = http.StatusBadRequest
-
-	var response lfunc.Response
-	response.Code = 1
-	response.Message = "操作失败"
+	response := g.Map{}
 
 	// 漫画 名
 	name := r.GetString("name")
 	if name == "" {
-		response.Message = "漫画名不存在"
-		r.Response.WriteJson(response)
+		r.Response.Status, response = lfunc.Response(cerror.ErrBookNameNotExist)
+		_ = r.Response.WriteJson(response)
 		return
 	}
 
-	like := "%" + name + "%"
+	like1 := "name like ?"
+	like2 := "%" + name + "%"
+
+	p := model.Params{
+		Where: g.Map{
+			like1: like2,
+		},
+		Sort: "created_at desc",
+	}
 
 	books := ([]model.TbBooks)(nil)
-	resp, err := ldb.GetDB().Table(config.TbNameBooks).Where("name like ?", like).OrderBy("created_at desc").Select()
-
+	bookModel := model.NewBooks()
+	resp, err := bookModel.GetDataExt(p)
 	if err != nil && err != sql.ErrNoRows {
-		llog.Log.Debug(err.Error())
-		response.Message = "漫画搜索失败[Book.Search]"
+		llog.Log.Warning(err.Error())
+		r.Response.Status, response = lfunc.Response(cerror.ErrGetData, g.Map{"message": "漫画搜索失败[Book.Search]"})
 	} else {
-		if err != sql.ErrNoRows {
+		if err != sql.ErrNoRows && resp != nil {
 			if err := resp.ToStructs(&books); err != nil {
 				llog.Log.Warning(err.Error())
 			}
 		}
-
-		r.Response.Status = http.StatusOK
-		response.Code = 0
-		response.Message = "操作成功"
-		response.Data = books
+		r.Response.Status, response = lfunc.Response(cerror.ErrSuccess, g.Map{"data": books})
 	}
 
-	r.Response.WriteJson(response)
+	_ = r.Response.WriteJson(response)
 }
 
 // Add 添加新漫画
 func (t *Book) Add(r *ghttp.Request) {
-	r.Response.Status = http.StatusBadRequest
-
-	var response lfunc.Response
-	response.Code = 1
-	response.Message = "操作失败"
+	response := g.Map{}
 
 	type form struct {
 		ID   int    `params:"id" gvalid:"id@required"`
@@ -136,11 +135,16 @@ func (t *Book) Add(r *ghttp.Request) {
 	}
 
 	formData := new(form)
-	r.GetToStruct(formData)
+	if err := r.GetToStruct(formData); err != nil {
+		r.Response.Status, response = lfunc.Response(cerror.ErrInvalidParameter)
+		_ = r.Response.WriteJson(response)
+		return
+	}
 
 	if err := gvalid.CheckStruct(formData, nil); err != nil {
-		response.Message = err.FirstString()
-		r.Response.WriteJson(response)
+		llog.Log.Warning(err.String())
+		r.Response.Status, response = lfunc.Response(cerror.ErrInvalidParameter)
+		_ = r.Response.WriteJson(response)
 		return
 	}
 
@@ -148,63 +152,82 @@ func (t *Book) Add(r *ghttp.Request) {
 		cliApp := command.NewCommand()
 
 		if err := cliApp.Add(formData.Site, formData.ID); err != nil {
-			response.Message = fmt.Sprintf("添加新漫画失败: %s", err.Error())
+			r.Response.Status, response = lfunc.Response(cerror.ErrAddData, g.Map{"message": "添加新漫画失败[Book.Add]"})
 		} else {
-			r.Response.Status = http.StatusCreated
-
-			response.Code = 0
-			response.Message = "添加新漫画成功"
+			r.Response.Status, response = lfunc.Response(cerror.ErrAddSuccess)
 		}
 	} else {
-		response.Message = fmt.Sprintf("不支持此网站 (%v) 添加新漫画", formData.Site)
+		param := g.Map{
+			"message": fmt.Sprintf("不支持此网站 (%v) 添加新漫画", formData.Site),
+		}
+		r.Response.Status, response = lfunc.Response(cerror.ErrInvalidParameter, param)
 	}
 
-	r.Response.WriteJson(response)
+	_ = r.Response.WriteJson(response)
 }
 
 // Update 更新漫画信息
 func (t *Book) Update(r *ghttp.Request) {
-	r.Response.Status = http.StatusBadRequest
-
-	var response lfunc.Response
-	response.Code = 1
-	response.Message = "操作失败"
+	response := g.Map{}
 
 	id := r.GetInt("id")
-
 	type form struct {
 		Status int `params:"status" gvalid:"status@in:0,1,2"`
 	}
 
 	formData := new(form)
-	r.GetToStruct(formData)
-
 	if err := r.GetToStruct(formData); err != nil {
-		response.Message = err.Error()
-		r.Response.WriteJson(response)
+		r.Response.Status, response = lfunc.Response(cerror.ErrInvalidParameter)
+		_ = r.Response.WriteJson(response)
 		return
 	}
 
 	if err := gvalid.CheckStruct(formData, nil); err != nil {
-		response.Message = err.FirstString()
-		r.Response.WriteJson(response)
+		llog.Log.Warning(err.String())
+		r.Response.Status, response = lfunc.Response(cerror.ErrInvalidParameter)
+		_ = r.Response.WriteJson(response)
 		return
 	}
 
 	data := g.Map{
-		"status": formData.Status,
+		"status":     formData.Status,
 		"updated_at": time.Now().Unix(),
 	}
 
-	_, err := ldb.GetDB().Table(config.TbNameBooks).Where(g.Map{"id": id}).Data(data).Update()
+	m := model.NewBooks()
+	_, err := m.UpdateData(data, g.Map{"id": id})
 	if err != nil {
 		llog.Log.Warningf(err.Error())
-		response.Message = "漫画更新失败[Book.Update]"
+		r.Response.Status, response = lfunc.Response(cerror.ErrUpdateData, g.Map{"message": "更新漫画失败[Book.Update]"})
 	} else {
-		r.Response.Status = http.StatusOK
-		response.Code = 0
-		response.Message = "操作成功"
+		r.Response.Status, response = lfunc.Response(cerror.ErrSuccess)
 	}
 
-	r.Response.WriteJson(response)
+	_ = r.Response.WriteJson(response)
+}
+
+// Delete 删除漫画
+func (t *Book) Delete(r *ghttp.Request) {
+	response := g.Map{}
+
+	id := r.GetInt("id")
+
+	// 深度删除 (删除关联的章节及图库)
+	isDeep := r.GetQueryBool("deep")
+
+	m := model.NewBooks()
+	_, err := m.DeleteData(g.Map{"id": id})
+	if err != nil {
+		llog.Log.Warningf(err.Error())
+		r.Response.Status, response = lfunc.Response(cerror.ErrUpdateData, g.Map{"message": "更新漫画失败[Book.Update]"})
+	} else {
+		r.Response.Status, response = lfunc.Response(cerror.ErrSuccess)
+
+		// 深度删除
+		if isDeep {
+
+		}
+	}
+
+	_ = r.Response.WriteJson(response)
 }

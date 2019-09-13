@@ -4,17 +4,15 @@ import (
 	"database/sql"
 	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/net/ghttp"
-	"github.com/skiy/comic-fetch/app/config"
-	"github.com/skiy/comic-fetch/app/library/ldb"
+	"github.com/skiy/comic-fetch/app/config/cerror"
 	"github.com/skiy/comic-fetch/app/library/lfunc"
 	"github.com/skiy/comic-fetch/app/library/llog"
 	"github.com/skiy/comic-fetch/app/model"
-	"net/http"
 )
 
 // Comic Comic
 type Comic struct {
-	core
+	Base
 }
 
 // NewComic Comic init
@@ -29,28 +27,24 @@ func NewComic() *Comic {
 // /api/books/:book_id/chapters/:chapter_id/comics[/:id]
 // /api/books/:book_id/chapters/:chapter_id/parts[/:comic_num]
 func (t *Comic) List(r *ghttp.Request) {
-	r.Response.Status = http.StatusBadRequest
-
-	var response lfunc.Response
-	response.Code = 1
-	response.Message = "操作失败"
+	response := g.Map{}
 
 	where := g.Map{}
 	sort := "id asc"
-	limit := 10
+	limit := 0
 
 	// 漫画 ID
 	bookID := r.GetInt("book_id")
 	if bookID == 0 {
-		response.Message = "漫画 ID 不存在"
-		r.Response.WriteJson(response)
+		r.Response.Status, response = lfunc.Response(cerror.ErrBookIDNotExist)
+		_ = r.Response.WriteJson(response)
 		return
 	}
 
 	chapterID := r.GetInt("chapter_id")
 	if chapterID == 0 {
-		response.Message = "漫画章节 ID 不存在"
-		r.Response.WriteJson(response)
+		r.Response.Status, response = lfunc.Response(cerror.ErrChapterIDNotExist)
+		_ = r.Response.WriteJson(response)
 		return
 	}
 
@@ -64,6 +58,7 @@ func (t *Comic) List(r *ghttp.Request) {
 		// 漫画章节序号
 		if num := r.GetInt("comic_num"); num != 0 {
 			where["order_id"] = num
+			limit = 1
 		}
 	}
 
@@ -85,25 +80,46 @@ func (t *Comic) List(r *ghttp.Request) {
 		limit = l
 	}
 
-	Comics := ([]model.TbImages)(nil)
-	resp, err := ldb.GetDB().Table(config.TbNameImages).Where(where).OrderBy(sort).Offset(offset).Limit(limit).Select()
+	p := model.Params{
+		Where:  where,
+		Sort:   sort,
+		Offset: offset,
+		Limit:  limit,
+	}
+
+	comics := ([]model.TbImages)(nil)
+	m := model.NewImages()
+	resp, err := m.GetDataExt(p)
 	if err != nil && err != sql.ErrNoRows {
-		llog.Log.Debug(err.Error())
-		response.Message = "漫画章节图库列表获取失败[comic.List]"
+		llog.Log.Warning(err.Error())
+		r.Response.Status, response = lfunc.Response(cerror.ErrGetData, g.Map{"message": "漫画章节图库列表获取失败[Comic.List]"})
 	} else {
-		if err != sql.ErrNoRows {
-			if err := resp.ToStructs(&Comics); err != nil {
-				response.Message = err.Error()
-				r.Response.WriteJson(response)
+		if err != sql.ErrNoRows && resp != nil {
+			if err := resp.ToStructs(&comics); err != nil {
+				llog.Log.Warning(err.Error())
 				return
 			}
 		}
-		r.Response.Status = http.StatusOK
-
-		response.Code = 0
-		response.Message = "操作成功"
-		response.Data = Comics
+		r.Response.Status, response = lfunc.Response(cerror.ErrSuccess, g.Map{"data": comics})
 	}
 
-	r.Response.WriteJson(response)
+	_ = r.Response.WriteJson(response)
+}
+
+// Delete 删除漫画图库
+func (t *Comic) Delete(r *ghttp.Request) {
+	response := g.Map{}
+
+	id := r.GetInt("id")
+
+	m := model.NewImages()
+	_, err := m.DeleteData(g.Map{"id": id})
+	if err != nil {
+		llog.Log.Warningf(err.Error())
+		r.Response.Status, response = lfunc.Response(cerror.ErrDeleteData, g.Map{"message": "删除漫画图库失败[Image.Delete]"})
+	} else {
+		r.Response.Status, response = lfunc.Response(cerror.ErrSuccess)
+	}
+
+	_ = r.Response.WriteJson(response)
 }

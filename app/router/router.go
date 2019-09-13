@@ -26,6 +26,7 @@ func init() {
 	apiGroup.GET("/books/:id", apiBooks.List)
 	apiGroup.POST("/books", apiBooks.Add)
 	apiGroup.PUT("/books/:id", apiBooks.Update)
+	apiGroup.DELETE("/books/:id", apiBooks.Delete)
 
 	apiChapters := api.NewChapter()
 	apiGroup.GET("/books/:book_id/chapters", apiChapters.List)
@@ -33,12 +34,14 @@ func init() {
 	apiGroup.GET("/books/:book_id/parts", apiChapters.List)
 	apiGroup.GET("/books/:book_id/parts/:chapter_num", apiChapters.List)
 	apiGroup.PUT("/books/:book_id/chapters/:id", apiChapters.Update)
+	apiGroup.DELETE("/books/:book_id/chapters/:id", apiChapters.Delete)
 
 	apiComics := api.NewComic()
 	apiGroup.GET("/books/:book_id/chapters/:chapter_id/comics", apiComics.List)
 	apiGroup.GET("/books/:book_id/chapters/:chapter_id/comics/:id", apiComics.List)
 	apiGroup.GET("/books/:book_id/chapters/:chapter_id/parts", apiComics.List)
 	apiGroup.GET("/books/:book_id/chapters/:chapter_id/parts/:comic_num", apiComics.List)
+	apiGroup.DELETE("/books/:book_id/chapters/:chapter_id/comics/:id", apiComics.Delete)
 
 	apiGroup.GET("/search/:name", apiBooks.Search)
 }

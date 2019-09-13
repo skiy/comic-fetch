@@ -1,4 +1,4 @@
-package lfunc
+package cdb
 
 // Response 回复结构体
 type Response struct {

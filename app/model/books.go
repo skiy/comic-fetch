@@ -25,7 +25,7 @@ type TbBooks struct {
 
 // Books 漫画
 type Books struct {
-	model
+	base
 }
 
 // NewBooks Books init
@@ -36,16 +36,31 @@ func NewBooks() *Books {
 }
 
 // GetDataOne 获取一条信息
-func (t *Books) GetDataOne(where interface{}) (device gdb.Record, err error) {
-	return t.DB.Table(config.TbNameBooks).Where(where).One()
+func (t *Books) GetDataOne(where interface{}) (record gdb.Record, err error) {
+	return t.getDataOne(config.TbNameBooks, where)
 }
 
 // AddData 添加一条信息
 func (t *Books) AddData(data ...interface{}) (result sql.Result, err error) {
-	return t.DB.Table(config.TbNameBooks).Data(data).Insert()
+	return t.addData(config.TbNameBooks, data)
+}
+
+// UpdateData 更新数据
+func (t *Books) UpdateData(data, where interface{}) (result sql.Result, err error) {
+	return t.updateData(config.TbNameBooks, data, where)
+}
+
+// DeleteData 删除数据
+func (t *Books) DeleteData(where interface{}) (result sql.Result, err error) {
+	return t.deleteData(config.TbNameBooks, where)
 }
 
 // GetData 获取一组数据
 func (t *Books) GetData(where interface{}) (result gdb.Result, err error) {
 	return t.DB.Table(config.TbNameBooks).Where(where).OrderBy("id DESC").Select()
+}
+
+// GetDataExt 获取一组数据 (扩展型)
+func (t *Books) GetDataExt(params Params) (result gdb.Result, err error) {
+	return t.getDataExt(config.TbNameBooks, params)
 }

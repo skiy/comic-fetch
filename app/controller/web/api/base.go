@@ -4,11 +4,12 @@ import (
 	"strings"
 )
 
-type core struct {
+// Base Base
+type Base struct {
 }
 
 // sort 构造排序
-func (t *core) sort(str string, filter map[string]bool) string {
+func (t *Base) sort(str string, filter map[string]bool) string {
 	arr := strings.Split(str, ",")
 	var sortArr []string
 	var order string

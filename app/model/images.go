@@ -22,7 +22,7 @@ type TbImages struct {
 
 // Images 图片
 type Images struct {
-	model
+	base
 }
 
 // NewImages Images init
@@ -33,24 +33,36 @@ func NewImages() *Images {
 }
 
 // GetDataOne 获取一条信息
-func (t *Images) GetDataOne(where interface{}) (device gdb.Record, err error) {
-	return t.DB.Table(config.TbNameImages).Where(where).One()
+func (t *Images) GetDataOne(where interface{}) (record gdb.Record, err error) {
+	return t.getDataOne(config.TbNameImages, where)
 }
 
 // AddData 添加一条信息
 func (t *Images) AddData(data ...interface{}) (result sql.Result, err error) {
-	return t.DB.Table(config.TbNameImages).Data(data).Insert()
+	return t.addData(config.TbNameImages, data)
+}
+
+// UpdateData 更新数据
+func (t *Images) UpdateData(data, where interface{}) (result sql.Result, err error) {
+	return t.updateData(config.TbNameImages, data, where)
+}
+
+// DeleteData 删除数据
+func (t *Images) DeleteData(where interface{}) (result sql.Result, err error) {
+	return t.deleteData(config.TbNameImages, where)
 }
 
 // GetData 获取一组数据
 func (t *Images) GetData(where interface{}) (result gdb.Result, err error) {
-	return t.DB.Table(config.TbNameImages).Where(where).Select()
+	return t.DB.Table(config.TbNameImages).Where(where).OrderBy("id DESC").Select()
+}
+
+// GetDataExt 获取一组数据 (扩展型)
+func (t *Images) GetDataExt(params Params) (result gdb.Result, err error) {
+	return t.getDataExt(config.TbNameImages, params)
 }
 
 // AddDataBatch 批量添加一组信息
 func (t *Images) AddDataBatch(data []TbImages, batch int) (result sql.Result, err error) {
-	if batch == 0 {
-		batch = len(data)
-	}
-	return t.DB.Table(config.TbNameImages).Data(data).Batch(batch).Insert()
+	return t.addDataBatch(config.TbNameImages, data, batch)
 }
