@@ -184,10 +184,12 @@ func main() {
 							id := c.Int("id")
 
 							cliApp := command2.NewCommand()
-							where := g.Map{
-								"origin_flag": site,
-							}
+							where := g.Map{}
 
+							if site != "" {
+								where["origin_flag"] = site
+							}
+							
 							if id != 0 {
 								where["origin_book_id"] = id
 							}

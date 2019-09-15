@@ -15,6 +15,8 @@ github.com/gf-third/mysql v1.4.2/go.mod h1:+dd90V663ppI2fV5uQ6+rHk0u8KCyU6FkG8Um
 github.com/gofrs/flock v0.7.1/go.mod h1:F1TvTiK9OcQqauNUHlbJvyl9Qa1QvF/gOUDKA14jxHU=
 github.com/gogf/gf v1.8.4-0.20190913164306-41a0b5293949 h1:9l5g+wuulxs7RWVEGzb/kF/vTgUxQAHSkgTzNtdflq8=
 github.com/gogf/gf v1.8.4-0.20190913164306-41a0b5293949/go.mod h1:sydYJsBWF/hK1c70XfvWnJBZ5wWt8d3QS7oiXnspyKw=
+github.com/gogf/gf v1.8.4-0.20190914153602-6d55b30b3912 h1:Pf9TzSXQqE6lR3DjSr/lFwlE/ApHpGjmd7nI9MeYlYA=
+github.com/gogf/gf v1.8.4-0.20190914153602-6d55b30b3912/go.mod h1:sydYJsBWF/hK1c70XfvWnJBZ5wWt8d3QS7oiXnspyKw=
 github.com/golang/protobuf v1.3.1/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=
 github.com/gomodule/redigo v2.0.0+incompatible h1:K/R+8tc58AaqLkqG2Ol3Qk+DR/TlNuhuh457pBFPtt0=
 github.com/gomodule/redigo v2.0.0+incompatible/go.mod h1:B4C85qUVwatsJoIUNIfCRsp7qO0iAmpGFZ4EELWSbC4=
