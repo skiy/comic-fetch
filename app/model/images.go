@@ -39,7 +39,7 @@ func (t *Images) GetDataOne(where interface{}) (record gdb.Record, err error) {
 
 // AddData 添加一条信息
 func (t *Images) AddData(data ...interface{}) (result sql.Result, err error) {
-	return t.addData(config.TbNameImages, data)
+	return t.addData(config.TbNameImages, data...)
 }
 
 // UpdateData 更新数据

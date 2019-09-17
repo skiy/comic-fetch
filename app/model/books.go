@@ -42,7 +42,7 @@ func (t *Books) GetDataOne(where interface{}) (record gdb.Record, err error) {
 
 // AddData 添加一条信息
 func (t *Books) AddData(data ...interface{}) (result sql.Result, err error) {
-	return t.addData(config.TbNameBooks, data)
+	return t.addData(config.TbNameBooks, data...)
 }
 
 // UpdateData 更新数据

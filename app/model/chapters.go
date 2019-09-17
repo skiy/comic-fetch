@@ -39,7 +39,7 @@ func (t *Chapters) GetDataOne(where interface{}) (record gdb.Record, err error) 
 
 // AddData 添加一条信息
 func (t *Chapters) AddData(data ...interface{}) (result sql.Result, err error) {
-	return t.addData(config.TbNameChapters, data)
+	return t.addData(config.TbNameChapters, data...)
 }
 
 // UpdateData 更新数据
@@ -53,8 +53,8 @@ func (t *Chapters) DeleteData(where interface{}) (result sql.Result, err error) 
 }
 
 // GetData 获取一组数据
-func (t *Chapters) GetData(where interface{}) (result gdb.Result, err error) {
-	return t.DB.Table(config.TbNameChapters).Where(where).OrderBy("id DESC").Select()
+func (t *Chapters) GetData(where interface{}, sort string) (result gdb.Result, err error) {
+	return t.getData(config.TbNameChapters, where, "")
 }
 
 // GetDataExt 获取一组数据 (扩展型)

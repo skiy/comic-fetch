@@ -58,12 +58,14 @@ func main() {
 		&cli.StringFlag{
 			Name:        "site",
 			Usage:       "Fetch comic from this site (support: manhuaniu, mh1234)",
+			Aliases:     []string{"s"},
 			Value:       "",
 			DefaultText: "",
 		},
 		&cli.IntFlag{
 			Name:        "id",
-			Usage:       "Origin comic id",
+			Usage:       "Origin comic id Or comic id",
+			Aliases:     []string{"i"},
 			Value:       0,
 			DefaultText: "0",
 		},
@@ -188,10 +190,12 @@ func main() {
 
 							if site != "" {
 								where["origin_flag"] = site
-							}
-							
-							if id != 0 {
-								where["origin_book_id"] = id
+
+								if id != 0 {
+									where["origin_book_id"] = id
+								}
+							} else if id != 0 {
+								where["id"] = id
 							}
 
 							if err := cliApp.Update(where); err != nil {

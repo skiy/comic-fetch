@@ -43,6 +43,14 @@ func (t *base) deleteData(name string, where interface{}) (result sql.Result, er
 	return t.DB.Table(name).Where(where).Delete()
 }
 
+// 获取数据
+func (t *base) getData(name string, where interface{}, sort string) (result gdb.Result, err error) {
+	if sort == "" {
+		sort = "id DESC"
+	}
+	return t.DB.Table(name).Where(where).OrderBy(sort).Select()
+}
+
 // GetDataExt 获取数据扩展方式
 func (t *base) getDataExt(name string, params Params) (result gdb.Result, err error) {
 	m := t.DB.Table(name).Where(params.Where)
