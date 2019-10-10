@@ -1,4 +1,4 @@
-package config
+package ctable
 
 var (
 	// TbNameBooks Books TbName

@@ -3,7 +3,7 @@ package model
 import (
 	"database/sql"
 	"github.com/gogf/gf/database/gdb"
-	"github.com/skiy/comic-fetch/app/config"
+	"github.com/skiy/comic-fetch/app/config/ctable"
 )
 
 // TbChapters 章节表
@@ -34,30 +34,30 @@ func NewChapters() *Chapters {
 
 // GetDataOne 获取一条信息
 func (t *Chapters) GetDataOne(where interface{}) (record gdb.Record, err error) {
-	return t.getDataOne(config.TbNameChapters, where)
+	return t.getDataOne(ctable.TbNameChapters, where)
 }
 
 // AddData 添加一条信息
 func (t *Chapters) AddData(data ...interface{}) (result sql.Result, err error) {
-	return t.addData(config.TbNameChapters, data...)
+	return t.addData(ctable.TbNameChapters, data...)
 }
 
 // UpdateData 更新数据
 func (t *Chapters) UpdateData(data, where interface{}) (result sql.Result, err error) {
-	return t.updateData(config.TbNameChapters, data, where)
+	return t.updateData(ctable.TbNameChapters, data, where)
 }
 
 // DeleteData 删除数据
 func (t *Chapters) DeleteData(where interface{}) (result sql.Result, err error) {
-	return t.deleteData(config.TbNameChapters, where)
+	return t.deleteData(ctable.TbNameChapters, where)
 }
 
 // GetData 获取一组数据
 func (t *Chapters) GetData(where interface{}, sort string) (result gdb.Result, err error) {
-	return t.getData(config.TbNameChapters, where, "")
+	return t.getData(ctable.TbNameChapters, where, "")
 }
 
 // GetDataExt 获取一组数据 (扩展型)
 func (t *Chapters) GetDataExt(params Params) (result gdb.Result, err error) {
-	return t.getDataExt(config.TbNameChapters, params)
+	return t.getDataExt(ctable.TbNameChapters, params)
 }

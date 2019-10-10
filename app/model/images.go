@@ -3,7 +3,7 @@ package model
 import (
 	"database/sql"
 	"github.com/gogf/gf/database/gdb"
-	"github.com/skiy/comic-fetch/app/config"
+	"github.com/skiy/comic-fetch/app/config/ctable"
 )
 
 // TbImages 图片表
@@ -34,35 +34,35 @@ func NewImages() *Images {
 
 // GetDataOne 获取一条信息
 func (t *Images) GetDataOne(where interface{}) (record gdb.Record, err error) {
-	return t.getDataOne(config.TbNameImages, where)
+	return t.getDataOne(ctable.TbNameImages, where)
 }
 
 // AddData 添加一条信息
 func (t *Images) AddData(data ...interface{}) (result sql.Result, err error) {
-	return t.addData(config.TbNameImages, data...)
+	return t.addData(ctable.TbNameImages, data...)
 }
 
 // UpdateData 更新数据
 func (t *Images) UpdateData(data, where interface{}) (result sql.Result, err error) {
-	return t.updateData(config.TbNameImages, data, where)
+	return t.updateData(ctable.TbNameImages, data, where)
 }
 
 // DeleteData 删除数据
 func (t *Images) DeleteData(where interface{}) (result sql.Result, err error) {
-	return t.deleteData(config.TbNameImages, where)
+	return t.deleteData(ctable.TbNameImages, where)
 }
 
 // GetData 获取一组数据
 func (t *Images) GetData(where interface{}) (result gdb.Result, err error) {
-	return t.DB.Table(config.TbNameImages).Where(where).OrderBy("id DESC").Select()
+	return t.getData(ctable.TbNameImages, where, "id DESC")
 }
 
 // GetDataExt 获取一组数据 (扩展型)
 func (t *Images) GetDataExt(params Params) (result gdb.Result, err error) {
-	return t.getDataExt(config.TbNameImages, params)
+	return t.getDataExt(ctable.TbNameImages, params)
 }
 
 // AddDataBatch 批量添加一组信息
 func (t *Images) AddDataBatch(data []TbImages, batch int) (result sql.Result, err error) {
-	return t.addDataBatch(config.TbNameImages, data, batch)
+	return t.addDataBatch(ctable.TbNameImages, data, batch)
 }
