@@ -8,8 +8,8 @@ import (
 	"github.com/gogf/gf/util/gconv"
 	"github.com/skiy/comic-fetch/app/config"
 	"github.com/skiy/comic-fetch/app/controller/command"
-	"github.com/skiy/comic-fetch/app/library/llog"
 	"github.com/skiy/comic-fetch/app/model"
+	"github.com/skiy/gfutils/llog"
 )
 
 // Command Command

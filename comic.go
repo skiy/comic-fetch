@@ -1,19 +1,17 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/os/gcfg"
 	"github.com/gogf/gf/os/glog"
 	"github.com/skiy/comic-fetch/app/config"
-	"github.com/skiy/comic-fetch/app/library/lcfg"
-	"github.com/skiy/comic-fetch/app/library/ldb"
-	"github.com/skiy/comic-fetch/app/library/llog"
 	command2 "github.com/skiy/comic-fetch/app/service/command"
 	"github.com/skiy/comic-fetch/app/service/web"
-	"gopkg.in/urfave/cli.v2"
+	"github.com/skiy/gfutils/lcfg"
+	"github.com/skiy/gfutils/ldb"
+	"github.com/skiy/gfutils/llog"
+	"github.com/urfave/cli/v2"
 	"os"
-	"runtime"
 	"sort"
 	"time"
 )
@@ -29,19 +27,42 @@ type command struct {
 var (
 	cfg *gcfg.Config
 	log *glog.Logger
+	err error
 	cmd command
 )
 
 const (
-	version = "1.0.0"
+	version = "2.0.0"
 	author  = "Skiy Chan"
 	email   = "dev@skiy.net"
 )
 
-func main() {
-	//全核性能启用
-	runtime.GOMAXPROCS(runtime.NumCPU())
+// load 加载配置信息
+func load() {
+	if cmd.config != "" {
+		lcfg.SetCfgName(cmd.config)
+	} else {
+		lcfg.SetCfgName("config.toml")
+	}
 
+	cfg, err = lcfg.Init()
+	if err != nil {
+		return
+	}
+
+	err = llog.Init()
+	if err != nil {
+		return
+	}
+	log = llog.Log
+
+	err = ldb.Init()
+	if err != nil {
+		return
+	}
+}
+
+func main() {
 	cli.VersionFlag = &cli.BoolFlag{
 		Name:    "version",
 		Aliases: []string{"v"},
@@ -151,6 +172,10 @@ func main() {
 							cmd.config = c.String("config")
 							load()
 
+							if err != nil {
+								log.Fatalf("%s\n", err.Error())
+							}
+
 							site := c.String("site")
 							id := c.Int("id")
 
@@ -181,6 +206,10 @@ func main() {
 						Action: func(c *cli.Context) error {
 							cmd.config = c.String("config")
 							load()
+
+							if err != nil {
+								log.Fatalf("%s\n", err.Error())
+							}
 
 							site := c.String("site")
 							id := c.Int("id")
@@ -222,9 +251,8 @@ func main() {
 func webStart() {
 	load()
 
-	// 判断 MYSQL 连接是否正常
-	if err := checkConnectDB(); err != nil {
-		log.Fatalf("数据库连接失败: %s", err.Error())
+	if err != nil {
+		log.Fatalf("%s\n", err.Error())
 	}
 
 	app := web.NewWeb()
@@ -240,9 +268,8 @@ func webStart() {
 func cliStart() {
 	load()
 
-	// 判断 MYSQL 连接是否正常
-	if err := checkConnectDB(); err != nil {
-		log.Fatalf("数据库连接失败: %s", err.Error())
+	if err != nil {
+		log.Fatalf("%s\n", err.Error())
 	}
 
 	app := command2.NewCommand()
@@ -251,33 +278,4 @@ func cliStart() {
 	if err := app.Update(g.Map{}); err != nil {
 		log.Fatalf("CLI 程序启动失败: %s", err.Error())
 	}
-}
-
-// checkConnectDB 检测数据库连接是否正常
-func checkConnectDB() (err error) {
-	if err = ldb.GetDB().PingMaster(); err != nil {
-		return fmt.Errorf("%s(Database)", err.Error())
-	}
-	return err
-}
-
-// load 加载配置信息
-func load() {
-	if cmd.config != "" {
-		lcfg.SetCfgName(cmd.config)
-	} else {
-		envDev := os.Getenv("ENVIRONMENT")
-		if envDev == "dev" || envDev == "develop" {
-			lcfg.SetCfgName("config.dev.toml")
-		}
-	}
-
-	//配置文件
-	cfg = lcfg.InitCfg()
-
-	//日志初始化
-	llog.InitLog()
-
-	//日志配置
-	log = llog.ReadLog()
 }

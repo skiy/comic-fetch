@@ -6,8 +6,8 @@ import (
 	"github.com/gogf/gf/net/ghttp"
 	"github.com/skiy/comic-fetch/app/config/cerror"
 	"github.com/skiy/comic-fetch/app/library/lfunc"
-	"github.com/skiy/comic-fetch/app/library/llog"
 	"github.com/skiy/comic-fetch/app/model"
+	"github.com/skiy/gfutils/llog"
 )
 
 // Comic Comic

@@ -7,8 +7,8 @@ import (
 	"github.com/gogf/gf/util/gvalid"
 	"github.com/skiy/comic-fetch/app/config/cerror"
 	"github.com/skiy/comic-fetch/app/library/lfunc"
-	"github.com/skiy/comic-fetch/app/library/llog"
 	"github.com/skiy/comic-fetch/app/model"
+	"github.com/skiy/gfutils/llog"
 	"time"
 )
 

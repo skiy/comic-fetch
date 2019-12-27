@@ -5,7 +5,7 @@ import (
 	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/net/ghttp"
 	"github.com/gogf/gf/util/gconv"
-	"github.com/skiy/comic-fetch/app/library/lcfg"
+	"github.com/skiy/gfutils/lcfg"
 )
 
 // NotifyMessage 通知消息
@@ -23,7 +23,7 @@ func NewNotifyMessage(flag int) *NotifyMessage {
 
 // Dingtalk 钉钉通知
 func (t *NotifyMessage) Dingtalk(params ...interface{}) (err error) {
-	cfg := lcfg.GetCfg()
+	cfg := lcfg.Get()
 
 	notifyURL := fmt.Sprintf("https://oapi.dingtalk.com/robot/send?access_token=%s", cfg.GetString("notify.dingtalk.robot_access_token"))
 

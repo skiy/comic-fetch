@@ -9,9 +9,9 @@ import (
 	"github.com/skiy/comic-fetch/app/config"
 	"github.com/skiy/comic-fetch/app/config/cerror"
 	"github.com/skiy/comic-fetch/app/library/lfunc"
-	"github.com/skiy/comic-fetch/app/library/llog"
 	"github.com/skiy/comic-fetch/app/model"
 	"github.com/skiy/comic-fetch/app/service/command"
+	"github.com/skiy/gfutils/llog"
 	"time"
 )
 
@@ -74,7 +74,7 @@ func (t *Book) List(r *ghttp.Request) {
 	} else {
 		if err != sql.ErrNoRows {
 			if resp != nil {
-				if err := resp.ToStructs(&books); err != nil {
+				if err := resp.Structs(&books); err != nil {
 					llog.Log.Warning(err.Error())
 				}
 			}

@@ -9,13 +9,13 @@ import (
 	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/os/gfile"
 	"github.com/skiy/comic-fetch/app/config"
-	"github.com/skiy/comic-fetch/app/library/lcfg"
 	"github.com/skiy/comic-fetch/app/library/lfetch"
-	"github.com/skiy/comic-fetch/app/library/lfilepath"
-	"github.com/skiy/comic-fetch/app/library/llog"
 	"github.com/skiy/comic-fetch/app/library/lnotify"
-	"github.com/skiy/comic-fetch/app/library/lstrings"
 	"github.com/skiy/comic-fetch/app/model"
+	"github.com/skiy/gfutils/lcfg"
+	"github.com/skiy/gfutils/lcommon"
+	"github.com/skiy/gfutils/lfilepath"
+	"github.com/skiy/gfutils/llog"
 	"io"
 	"os"
 	"regexp"
@@ -136,7 +136,7 @@ func (t *base) ToFetch() (err error) {
 	}
 
 	orderID := len(chapters) + 1
-	cfg := lcfg.GetCfg()
+	cfg := lcfg.Get()
 
 	imageLocal := cfg.GetBool("image.local")
 	filePath := cfg.GetString("image.path")
@@ -226,7 +226,7 @@ func (t *base) ToFetch() (err error) {
 
 				// 未通知过
 				if !t.Notified {
-					cfg := lcfg.GetCfg()
+					cfg := lcfg.Get()
 					notifyType := cfg.GetInt("notify.type")
 					notifyNewBook := cfg.GetBool("notify.book")
 
@@ -453,7 +453,7 @@ func (t *base) ToFetchChapter(chapterURL string) (chapterName string, imageURLLi
 
 		for _, images := range imagesList {
 			if len(images) == 2 {
-				imageURLList = append(imageURLList, "/"+strings.TrimLeft(lstrings.Stripslashes(chapterPath+images[1]), "/"))
+				imageURLList = append(imageURLList, "/"+strings.TrimLeft(lcommon.Stripslashes(chapterPath+images[1]), "/"))
 			}
 		}
 
