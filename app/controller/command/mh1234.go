@@ -18,7 +18,7 @@ func NewMh1234(books *model.TbBooks) *Mh1234 {
 	t.Prep.Book = `#Cover>img`
 	t.Prep.SiteURL = "%s/wap/comic/%d.html"
 	t.Prep.ChapterList = `#chapter-list-1 li a`
-	t.Prep.ChapterURL = `\/wap\/comic\/[0-9]*/([0-9]*).html`
+	t.Prep.ChapterURL = `\/comic\/[0-9]*/([0-9]*).html`
 	t.Prep.ChapterPath = `chapterPath = "([^"]*)"`
 	t.Prep.ImageStr = `chapterImages = \[([^\]]*)\]`
 	t.Prep.Chapter = `SinMH\.initChapter\(([^;]*)\)`

@@ -63,7 +63,7 @@ func (t *base) AddBook(siteURL string) (err error) {
 		return err
 	}
 
-	cfg := lcfg.GetCfg()
+	cfg := lcfg.Get()
 	notifyType := cfg.GetInt("notify.type")
 	notifyNewBook := cfg.GetBool("notify.book")
 

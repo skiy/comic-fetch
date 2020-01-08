@@ -23,6 +23,8 @@ github.com/gogf/gf v1.8.4-0.20190914153602-6d55b30b3912 h1:Pf9TzSXQqE6lR3DjSr/lF
 github.com/gogf/gf v1.8.4-0.20190914153602-6d55b30b3912/go.mod h1:sydYJsBWF/hK1c70XfvWnJBZ5wWt8d3QS7oiXnspyKw=
 github.com/gogf/gf v1.10.1 h1:mu1VWviGm8ucgFNODQnw8ourgvgNBBovbLFbot/70BY=
 github.com/gogf/gf v1.10.1/go.mod h1:/37gncPmuM06D4YSqiDze9GsasDtF2QnWkUfKeiGW/Q=
+github.com/gogf/gf v1.11.1 h1:kYZY3zgo1pAYMWl00yO9AP29yPMSJrxFSdZsyXZ36z8=
+github.com/gogf/gf v1.11.1/go.mod h1:/37gncPmuM06D4YSqiDze9GsasDtF2QnWkUfKeiGW/Q=
 github.com/golang/protobuf v1.3.1/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=
 github.com/gomodule/redigo v2.0.0+incompatible h1:K/R+8tc58AaqLkqG2Ol3Qk+DR/TlNuhuh457pBFPtt0=
 github.com/gomodule/redigo v2.0.0+incompatible/go.mod h1:B4C85qUVwatsJoIUNIfCRsp7qO0iAmpGFZ4EELWSbC4=

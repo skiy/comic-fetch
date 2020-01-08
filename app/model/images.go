@@ -62,7 +62,10 @@ func (t *Images) GetDataExt(params Params) (result gdb.Result, err error) {
 	return t.getDataExt(ctable.TbNameImages, params)
 }
 
-// AddDataBatch 批量添加一组信息
-func (t *Images) AddDataBatch(data interface{}, batch int) (result sql.Result, err error) {
-	return t.addDataBatch(ctable.TbNameImages, data, batch)
+// AddDataBatch 批量添加一组图片
+func (t *Images) AddDataBatch(data []TbImages, batch int) (result sql.Result, err error) {
+	if batch == 0 {
+		batch = len(data)
+	}
+	return t.db.Table(ctable.TbNameImages).Data(data).Batch(batch).Insert()
 }
