@@ -115,7 +115,7 @@ func (t *Book) Search(r *ghttp.Request) {
 		r.Response.Status, response = lfunc.Response(cerror.ErrGetData, g.Map{"message": "漫画搜索失败[Book.Search]"})
 	} else {
 		if err != sql.ErrNoRows && resp != nil {
-			if err := resp.ToStructs(&books); err != nil {
+			if err := resp.Structs(&books); err != nil {
 				llog.Log.Warning(err.Error())
 			}
 		}
@@ -135,7 +135,7 @@ func (t *Book) Add(r *ghttp.Request) {
 	}
 
 	formData := new(form)
-	if err := r.GetToStruct(formData); err != nil {
+	if err := r.GetStruct(formData); err != nil {
 		r.Response.Status, response = lfunc.Response(cerror.ErrInvalidParameter)
 		_ = r.Response.WriteJson(response)
 		return
@@ -176,7 +176,7 @@ func (t *Book) Update(r *ghttp.Request) {
 	}
 
 	formData := new(form)
-	if err := r.GetToStruct(formData); err != nil {
+	if err := r.GetStruct(formData); err != nil {
 		r.Response.Status, response = lfunc.Response(cerror.ErrInvalidParameter)
 		_ = r.Response.WriteJson(response)
 		return

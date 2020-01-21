@@ -95,7 +95,7 @@ func (t *Comic) List(r *ghttp.Request) {
 		r.Response.Status, response = lfunc.Response(cerror.ErrGetData, g.Map{"message": "漫画章节图库列表获取失败[Comic.List]"})
 	} else {
 		if err != sql.ErrNoRows && resp != nil {
-			if err := resp.ToStructs(&comics); err != nil {
+			if err := resp.Structs(&comics); err != nil {
 				llog.Log.Warning(err.Error())
 				return
 			}

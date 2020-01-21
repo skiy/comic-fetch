@@ -86,7 +86,7 @@ func (t *Chapter) List(r *ghttp.Request) {
 		r.Response.Status, response = lfunc.Response(cerror.ErrGetData, g.Map{"message": "获取漫画章节列表失败[Chapter.List]"})
 	} else {
 		if err != sql.ErrNoRows && resp != nil {
-			if err := resp.ToStructs(&chapters); err != nil {
+			if err := resp.Structs(&chapters); err != nil {
 				llog.Log.Warning(err.Error())
 			}
 		}
@@ -121,7 +121,7 @@ func (t *Chapter) Update(r *ghttp.Request) {
 	}
 
 	formData := new(form)
-	if err := r.GetToStruct(formData); err != nil {
+	if err := r.GetStruct(formData); err != nil {
 		r.Response.Status, response = lfunc.Response(cerror.ErrInvalidParameter)
 		_ = r.Response.WriteJson(response)
 		return

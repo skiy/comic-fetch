@@ -32,7 +32,7 @@ func (t *Command) Update(where interface{}) (err error) {
 		return err
 	}
 
-	if err := resp.ToStructs(&books); err != nil {
+	if err := resp.Structs(&books); err != nil {
 		return err
 	}
 

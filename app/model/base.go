@@ -64,7 +64,7 @@ func (t *base) getData(name string, where interface{}, sort string) (result gdb.
 		}
 	}
 
-	return m.OrderBy(sort).Select()
+	return m.Order(sort).All()
 }
 
 // GetDataExt 获取数据扩展方式
@@ -85,14 +85,14 @@ func (t *base) getDataExt(name string, params Params) (result gdb.Result, err er
 	}
 
 	if params.Sort != "" {
-		m = m.OrderBy(params.Sort)
+		m = m.Order(params.Sort)
 	}
 
 	if params.Limit > 0 {
 		m = m.Offset(params.Offset).Limit(params.Limit)
 	}
 
-	result, err = m.Select()
+	result, err = m.All()
 	return
 }
 

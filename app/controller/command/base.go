@@ -124,7 +124,7 @@ func (t *base) ToFetch() (err error) {
 	chapterStatusMap := map[int]model.TbChapters{}
 
 	if chapterRes != nil {
-		if err := chapterRes.ToStructs(&chapters); err != nil {
+		if err := chapterRes.Structs(&chapters); err != nil {
 			return err
 		}
 
